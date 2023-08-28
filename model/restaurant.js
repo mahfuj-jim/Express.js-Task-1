@@ -34,7 +34,6 @@ class Restaurant {
       const restaurantData = responseData.data;
 
       const restaurant = restaurantData.filter((item) => item.id == id);
-      console.log(restaurant.length);
 
       if (restaurant.length != 0) {
         writeToLogFile(`Get Restaurant with ID ${id}`);
@@ -98,12 +97,8 @@ class Restaurant {
         );
 
         if (JSON.stringify(validationError) === "{}") {
-          newRestaurant = {
-            id: parseInt(id),
-            ...newRestaurant,
-          };
-
           restaurantData[restaurantIndex] = {
+            id: parseInt(id),
             ...responseData[restaurantIndex],
             ...newRestaurant,
           };
@@ -115,7 +110,7 @@ class Restaurant {
           );
           writeToLogFile(`Update Restaurant with ID ${id}`);
 
-          return { success: true, data: newRestaurant };
+          return { success: true, data: restaurantData[restaurantIndex] };
         } else {
           return { success: false, code: 400, error: validationError };
         }
