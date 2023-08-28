@@ -9,6 +9,7 @@ const PORT = 8000;
 
 app.use(express.json());
 app.use(express.text());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/restaurant/all", async (req, res) => {
   try {
@@ -96,6 +97,40 @@ app.delete("/restaurant/delete/:restaurantId", async (req, res) => {
     }
   } catch (err) {
     failure(res, 500, "Failed to delete data", "Internal Server Issue");
+  }
+});
+
+app.get("/restaurant/review", async (req, res) => {
+  try {
+    const { restaurantId } = req.query;
+    const result = await Restaurant.getRestaurantReview(restaurantId);
+
+    if (result.success) {
+      success(res, "Successfully Received Reviews.", result.data);
+    } else {
+      failure(res, result.code, "Failed to get reviews", result.error);
+    }
+  } catch (err) {
+    failure(res, 500, "Failed to get reviews", "Internal Server Error");
+  }
+});
+
+app.post("/restaurant/review", async (req, res) => {
+  try {
+    const { restaurantId } = req.query;
+    const result = await Restaurant.createRestaurantReview(
+      restaurantId,
+      JSON.parse(req.body)
+    );
+
+    if (result.success) {
+      success(res, "Successfully Received Reviews.", result.data);
+    } else {
+      failure(res, result.code, "Failed to add review", result.error);
+    }
+  } catch (err) {
+    console.log(err);
+    failure(res, 500, "Failed to add review", "Internal Server Error");
   }
 });
 
