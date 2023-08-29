@@ -76,61 +76,50 @@ class Order {
       const restaurantData = await Restaurant.getAllRestaurantData();
       const userData = await User.getAllUserData();
 
-      const validationError = this.validateNewOrderData(
-        newOrder,
-        restaurantData,
-        userData
+      const time = `${getCurrentDateTime()}`;
+      let total_price = 0;
+
+      const restaurant = restaurantData.data.find(
+        (restaurant) => restaurant.id === newOrder.restaurant_id
       );
 
-      if (JSON.stringify(validationError) === "{}") {
-        const time = `${getCurrentDateTime()}`;
-        let total_price = 0;
+      newOrder.order_list = await Promise.all(
+        newOrder.order_list.map((item) => {
+          const orderItem = restaurant.menu.find(
+            (menu) => item.menu_id === menu.id
+          );
+          total_price += orderItem.price * item.quantity;
 
-        const restaurant = restaurantData.data.find(
-          (restaurant) => restaurant.id === newOrder.restaurant_id
-        );
+          return {
+            dish_name: orderItem.dishName,
+            price: orderItem.price,
+            quantity: item.quantity,
+          };
+        })
+      );
 
-        newOrder.order_list = await Promise.all(
-          newOrder.order_list.map((item) => {
-            const orderItem = restaurant.menu.find(
-              (menu) => item.menu_id === menu.id
-            );
-            total_price += orderItem.price * item.quantity;
+      const delivery_fee = restaurant.deliveryOptions.deliveryFee;
+      total_price += delivery_fee;
 
-            return {
-              dish_name: orderItem.dishName,
-              price: orderItem.price,
-              quantity: item.quantity,
-            };
-          })
-        );
+      newOrder = {
+        order_id: orderData[orderData.length - 1].order_id + 1,
+        time: time,
+        order_status: "On Process",
+        delivery_fee: delivery_fee,
+        total_price: total_price,
+        ...newOrder,
+      };
 
-        const delivery_fee = restaurant.deliveryOptions.deliveryFee;
-        total_price += delivery_fee;
+      orderData.push(newOrder);
 
-        newOrder = {
-          order_id: orderData[orderData.length - 1].order_id + 1,
-          time: time,
-          order_status: "On Process",
-          delivery_fee: delivery_fee,
-          total_price: total_price,
-          ...newOrder,
-        };
+      await fsPromise.writeFile(
+        this.orderFilePath,
+        JSON.stringify(orderData),
+        "utf-8"
+      );
+      writeToLogFile(`Create Order with ID ${newOrder.order_id}`);
 
-        orderData.push(newOrder);
-
-        await fsPromise.writeFile(
-          this.orderFilePath,
-          JSON.stringify(orderData),
-          "utf-8"
-        );
-        writeToLogFile(`Create Order with ID ${newOrder.order_id}`);
-
-        return { success: true, data: newOrder };
-      } else {
-        console.log("error");
-        return { success: false, code: 400, error: validationError };
-      }
+      return { success: true, data: newOrder };
     } catch (err) {
       console.log(err);
       return { success: false, code: 500, error: "Internal Server Issue" };
@@ -241,51 +230,6 @@ class Order {
     } catch (err) {
       return { success: false, code: 500, error: "Internal Server Issue" };
     }
-  }
-
-  async validateNewOrderData(newOrder, restaurantData, userData) {
-    const { user_id, restaurant_id, order_list, location } = newOrder;
-    const errors = {};
-
-    if (!user_id) {
-      errors.user_id = "User ID is not provided";
-    } else {
-      const userIndex = userData.data.findIndex(
-        (user) => user.user_id === newOrder.user_id
-      );
-      if (userIndex == -1) {
-        errors.user_id = "User ID not found";
-      }
-    }
-
-    if (!restaurant_id) {
-      errors.restaurant_id = "Restaurant ID is not provided";
-    } else {
-      const restaurantIndex = restaurantData.data.findIndex(
-        (restaurant) => newOrder.restaurant_id === restaurant.id
-      );
-      if (restaurantIndex == -1) {
-        errors.restaurant_id = "Restaurant ID not found";
-      } else {
-        if (
-          !restaurantData.data[restaurantIndex].deliveryOptions.deliveryArea
-            .toLowerCase()
-            .includes(location.toLowerCase())
-        ) {
-          errors.location = "Delivery is not available in your location";
-        }
-      }
-    }
-
-    if (!order_list || order_list.length === 0) {
-      errors.order_list = "Order List is not provided";
-    }
-
-    if (!location || location === "") {
-      errors.location = "Location is not provided";
-    }
-
-    return errors;
   }
 }
 
