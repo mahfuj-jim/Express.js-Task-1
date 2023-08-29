@@ -22,7 +22,7 @@ const getCurrentDateTime = () => {
 };
 
 const writeToLogFile = async (message) => {
-  const logFilePath = path.join(__dirname, "..", "history", "history.log");
+  const logFilePath = path.join(__dirname, "..", "server", "server.log");
   const formattedMessage = `${getCurrentDateTime()} - ${message}\n`;
 
   return fsPromise.appendFile(logFilePath, formattedMessage, (err) => {
