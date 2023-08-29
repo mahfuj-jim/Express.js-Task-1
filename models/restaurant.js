@@ -52,30 +52,20 @@ class Restaurant {
       const responseData = await this.getAllRestaurantData();
       const restaurantData = responseData.data;
 
-      const validationError = this.validateNewRestaurantData(
-        restaurantData,
-        newRestaurant,
-        true
+      newRestaurant = {
+        id: restaurantData[restaurantData.length - 1].id + 1,
+        ...newRestaurant,
+      };
+      restaurantData.push(newRestaurant);
+
+      await fsPromise.writeFile(
+        this.restaurantFilePath,
+        JSON.stringify(restaurantData),
+        "utf-8"
       );
+      writeToLogFile(`Create Restaurant with ID ${newRestaurant.id}`);
 
-      if (JSON.stringify(validationError) === "{}") {
-        newRestaurant = {
-          id: restaurantData[restaurantData.length - 1].id + 1,
-          ...newRestaurant,
-        };
-        restaurantData.push(newRestaurant);
-
-        await fsPromise.writeFile(
-          this.restaurantFilePath,
-          JSON.stringify(restaurantData),
-          "utf-8"
-        );
-        writeToLogFile(`Create Restaurant with ID ${newRestaurant.id}`);
-
-        return { success: true, data: newRestaurant };
-      } else {
-        return { success: false, code: 400, error: validationError };
-      }
+      return { success: true, data: newRestaurant };
     } catch (err) {
       console.log(err);
       return { success: false, code: 500, error: "Internal Server Issue" };
@@ -90,30 +80,20 @@ class Restaurant {
       const restaurantIndex = restaurantData.findIndex((item) => item.id == id);
 
       if (restaurantIndex != -1) {
-        const validationError = this.validateNewRestaurantData(
-          restaurantData,
-          newRestaurant,
-          false
+        restaurantData[restaurantIndex] = {
+          id: parseInt(id),
+          ...responseData[restaurantIndex],
+          ...newRestaurant,
+        };
+
+        await fsPromise.writeFile(
+          this.restaurantFilePath,
+          JSON.stringify(restaurantData),
+          "utf-8"
         );
+        writeToLogFile(`Update Restaurant with ID ${id}`);
 
-        if (JSON.stringify(validationError) === "{}") {
-          restaurantData[restaurantIndex] = {
-            id: parseInt(id),
-            ...responseData[restaurantIndex],
-            ...newRestaurant,
-          };
-
-          await fsPromise.writeFile(
-            this.restaurantFilePath,
-            JSON.stringify(restaurantData),
-            "utf-8"
-          );
-          writeToLogFile(`Update Restaurant with ID ${id}`);
-
-          return { success: true, data: restaurantData[restaurantIndex] };
-        } else {
-          return { success: false, code: 400, error: validationError };
-        }
+        return { success: true, data: restaurantData[restaurantIndex] };
       } else {
         return {
           success: false,
@@ -253,73 +233,6 @@ class Restaurant {
       console.log(err);
       return { success: false, code: 500, error: "Internal Server Issue" };
     }
-  }
-
-  validateNewRestaurantData(restaurantData, newRestaurant, isNewRestaurant) {
-    const {
-      name,
-      openHours,
-      deliveryOptions,
-      location,
-      cuisine,
-      contactNumber,
-      owner,
-    } = newRestaurant;
-
-    const errors = {};
-
-    if (!name || name === "") {
-      errors.name = "Name was not provided";
-    } else if (isNewRestaurant) {
-      const existingName = restaurantData.filter((item) => item.name === name);
-      if (existingName.length != 0) {
-        errors.name = "Name already exists";
-      }
-    }
-
-    if (!openHours || openHours === "") {
-      errors.openHours = "Open Hour was not provided";
-    } else {
-      const { weekdays, weekends } = openHours;
-
-      if (!weekends || weekends === "" || !weekdays || weekdays === "") {
-        errors.openHours = "Open Hour was not provided Accurately";
-      }
-    }
-
-    if (!deliveryOptions || deliveryOptions === "") {
-      errors.openHours = "Delivery Options was not provided Accurately";
-    } else {
-      const { deliveryArea, deliveryFee } = deliveryOptions;
-
-      if (!deliveryArea || deliveryArea === "" || deliveryArea.length == 0) {
-        errors.deliveryArea = "Delivery Area was not provided";
-      }
-
-      if (!deliveryFee || deliveryFee === "") {
-        errors.deliveryFee = "Delivery Fee is not provided";
-      } else if (deliveryFee > 100) {
-        errors.deliveryFee = "Delivery Fee should not more than 100";
-      }
-    }
-
-    if (!location || location === "") {
-      errors.location = "Location was not provided";
-    }
-
-    if (!cuisine || cuisine === "") {
-      errors.location = "Cuisine was not provided";
-    }
-
-    if (!contactNumber || contactNumber === "") {
-      errors.location = "Contact Number was not provided";
-    }
-
-    if (!owner || owner === "") {
-      errors.location = "Owner was not provided";
-    }
-
-    return errors;
   }
 }
 
