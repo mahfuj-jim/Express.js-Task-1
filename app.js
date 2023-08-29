@@ -1,8 +1,7 @@
 const express = require("express");
 const restaurantRoutes = require('./routes/restaurant_route.js');
 const userRoutes = require('./routes/user_route.js');
-// const orderController = require('./controllers/orders_controller.js');
-// const userController = require('./controllers/user_controller.js');
+const orderRoutes = require('./routes/order_route.js');
 
 const PORT = 8000;
 const app = express();
@@ -13,8 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/restaurant', restaurantRoutes);
 app.use('/user', userRoutes);
-// app.use('/order', orderController);
-// app.use('/user', userController);  
+app.use('/order', orderRoutes);
 
 app.use((req, res) => {
   failure(res, 400, "Not Found", "Request not found");

@@ -1,7 +1,5 @@
 const { success, failure } = require("../util/common.js");
 const User = require("../models/user.js");
-const express = require("express");
-const router = express.Router();
 
 class UserController {
   async getAllUserData(req, res) {
