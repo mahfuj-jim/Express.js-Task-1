@@ -97,7 +97,11 @@ class RestaurantController {
 
   async getRestaurantReview(req, res) {
     try {
-      const { restaurantId } = req.query;
+      const authHeader = req.header("Authorization");
+      const token = authHeader.substring(7);
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      const restaurantId = decodedToken.restaurant.id;
+
       const result = await Restaurant.getRestaurantReview(restaurantId);
 
       if (result.success) {
