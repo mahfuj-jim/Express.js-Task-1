@@ -83,9 +83,6 @@ class UserController {
         );
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      console.log(hashedPassword);
-
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
         return failure(res, 401, "Authentication failed", "Wrong Password");

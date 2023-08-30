@@ -1,7 +1,9 @@
 const { success, failure } = require("../util/common.js");
 const Order = require("../models/order.js");
-const express = require("express");
-const router = express.Router();
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 class OrderController {
   async getAllOrderData(req, res) {
@@ -47,6 +49,25 @@ class OrderController {
         failure(res, 400, "Failed to connect", "Request not found");
       }
     } catch (err) {
+      failure(res, 500, "Failed to get data", "Internal Server Error");
+    }
+  }
+
+  async getOrderByUserID(req, res) {
+    try {
+      const authHeader = req.header("Authorization");
+      const token = authHeader.substring(7);
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      const user_id = decodedToken.user.user_id;
+
+      const result = await Order.getUserOrder(user_id);
+      if (result.success) {
+        success(res, "Successfully Received.", result.data);
+      } else {
+        failure(res, result.code, "Failed to get data", result.error);
+      }
+    } catch (err) {
+      console.log(err);
       failure(res, 500, "Failed to get data", "Internal Server Error");
     }
   }
