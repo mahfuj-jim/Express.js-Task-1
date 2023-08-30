@@ -38,13 +38,6 @@ class OrderController {
         } else {
           failure(res, result.code, "Failed to get data", result.error);
         }
-      } else if (user_id !== undefined) {
-        const result = await Order.getUserOrder(user_id);
-        if (result.success) {
-          success(res, "Successfully Received.", result.data);
-        } else {
-          failure(res, result.code, "Failed to get data", result.error);
-        }
       } else {
         failure(res, 400, "Failed to connect", "Request not found");
       }
