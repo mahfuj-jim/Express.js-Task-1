@@ -80,11 +80,12 @@ class Restaurant {
       const restaurantIndex = restaurantData.findIndex((item) => item.id == id);
 
       if (restaurantIndex != -1) {
-        restaurantData[restaurantIndex] = {
-          id: parseInt(id),
-          ...responseData[restaurantIndex],
+        const updatedRestaurant = {
+          ...restaurantData[restaurantIndex],
           ...newRestaurant,
         };
+
+        restaurantData[restaurantIndex] = updatedRestaurant;
 
         await fsPromise.writeFile(
           this.restaurantFilePath,

@@ -8,9 +8,18 @@ dotenv.config();
 class RestaurantController {
   async getAllRestaurantData(req, res) {
     try {
+      const page = parseInt(req.query.page) || 1; 
+      const pageSize = parseInt(req.query.pageSize) || 10;
+
       const result = await Restaurant.getAllRestaurantData(true);
       if (result.success) {
-        success(res, "Successfully Received.", result.data);
+        const restaurantData = result.data;
+
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedRestaurants = restaurantData.slice(startIndex, endIndex);
+
+        success(res, "Successfully Received.", paginatedRestaurants);
       } else {
         failure(res, 500, "Failed to get data", result.error);
       }
@@ -63,8 +72,6 @@ class RestaurantController {
     try {
       const { restaurantId } = req.params;
 
-      console.log(restaurantId);
-
       const result = await Restaurant.updateRestaurant(
         restaurantId,
         JSON.parse(req.body)
@@ -97,11 +104,7 @@ class RestaurantController {
 
   async getRestaurantReview(req, res) {
     try {
-      const authHeader = req.header("Authorization");
-      const token = authHeader.substring(7);
-      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-      const restaurantId = decodedToken.restaurant.id;
-
+      const { restaurantId } = req.query;
       const result = await Restaurant.getRestaurantReview(restaurantId);
 
       if (result.success) {
