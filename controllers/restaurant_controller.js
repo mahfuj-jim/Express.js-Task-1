@@ -1,6 +1,7 @@
 const { success, failure } = require("../util/common.js");
 const Restaurant = require("../models/restaurant.js");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -8,7 +9,7 @@ dotenv.config();
 class RestaurantController {
   async getAllRestaurantData(req, res) {
     try {
-      const page = parseInt(req.query.page) || 1; 
+      const page = parseInt(req.query.page) || 1;
       const pageSize = parseInt(req.query.pageSize) || 10;
 
       const result = await Restaurant.getAllRestaurantData(true);
@@ -46,7 +47,11 @@ class RestaurantController {
 
   async createRestaurant(req, res) {
     try {
-      const result = await Restaurant.createRestaurant(JSON.parse(req.body));
+      let restaurant = JSON.parse(req.body);
+      const hashedPassword = await bcrypt.hash(restaurant.password, 10);
+      restaurant = { ...restaurant, password: hashedPassword };
+
+      const result = await Restaurant.createRestaurant(restaurant);
 
       if (result.success) {
         success(res, "Successfully Created.", result.data);
@@ -59,6 +64,7 @@ class RestaurantController {
         );
       }
     } catch (err) {
+      console.log(err);
       failure(
         res,
         500,
@@ -158,7 +164,7 @@ class RestaurantController {
             rating: restaurant.rating,
             contactNumber: restaurant.contactNumber,
             owner: restaurant.owner,
-            email: restaurant.email
+            email: restaurant.email,
           },
           role: "restaurant",
         },
@@ -175,7 +181,7 @@ class RestaurantController {
           rating: restaurant.rating,
           contactNumber: restaurant.contactNumber,
           owner: restaurant.owner,
-          email: restaurant.email
+          email: restaurant.email,
         },
       });
     } catch (err) {

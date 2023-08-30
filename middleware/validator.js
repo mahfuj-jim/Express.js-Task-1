@@ -44,6 +44,7 @@ const validateRestaurantData = (req, res, next) => {
     cuisine,
     contactNumber,
     owner,
+    password,
   } = newRestaurant;
 
   const errors = {};
@@ -92,6 +93,12 @@ const validateRestaurantData = (req, res, next) => {
 
   if (!owner || owner === "") {
     errors.owner = "Owner was not provided";
+  }
+
+  if (!password || password === "") {
+    errors.password = "Password was not provided";
+  }else if(password.length < 8){
+    errors.password = "Password must be 8 or more characters";
   }
 
   if (Object.keys(errors).length > 0) {
