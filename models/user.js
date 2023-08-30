@@ -44,11 +44,6 @@ class User {
       const responseData = await this.getAllUserData();
       const userData = responseData.data;
 
-      const userexist = await this.findByEmail(newUser.email);
-      if (userexist) {
-        return { success: false, code: 401, error: "Email Already Exist" };
-      }
-
       newUser = {
         user_id: userData[userData.length - 1].user_id + 1,
         ...newUser,

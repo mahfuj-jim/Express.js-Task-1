@@ -88,7 +88,12 @@ class OrderController {
 
   async createOrder(req, res) {
     try {
-      const result = await Order.createOrder(JSON.parse(req.body));
+      const authHeader = req.header("Authorization");
+      const token = authHeader.substring(7);
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      const user_id = decodedToken.user.user_id;
+
+      const result = await Order.createOrder(user_id, JSON.parse(req.body));
 
       if (result.success) {
         success(res, "Successfully Created.", result.data);

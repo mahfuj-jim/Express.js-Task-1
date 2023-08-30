@@ -38,9 +38,15 @@ class UserController {
   async signup(req, res) {
     try {
       let newUser = JSON.parse(req.body);
-      const hashedPassword = await bcrypt.hash(newUser.password, 10);
 
+      const existingUser = await User.findByEmail(newUser.email);
+      if (existingUser) {
+        return failure(res, 401, "Signup failed", "Email Already Exist");
+      }
+
+      const hashedPassword = await bcrypt.hash(newUser.password, 10);
       newUser = { ...newUser, password: hashedPassword };
+
       const result = await User.createUser(newUser);
 
       if (!result.success) {

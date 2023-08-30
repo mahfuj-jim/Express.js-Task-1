@@ -68,13 +68,12 @@ class Order {
     }
   }
 
-  async createOrder(newOrder) {
+  async createOrder(user_id, newOrder) {
     try {
       const responseData = await this.getAllOrderData();
       const orderData = responseData.data;
 
       const restaurantData = await Restaurant.getAllRestaurantData();
-      const userData = await User.getAllUserData();
 
       const time = `${getCurrentDateTime()}`;
       let total_price = 0;
@@ -107,6 +106,7 @@ class Order {
         order_status: "On Process",
         delivery_fee: delivery_fee,
         total_price: total_price,
+        user_id: user_id,
         ...newOrder,
       };
 

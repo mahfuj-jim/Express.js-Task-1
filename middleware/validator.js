@@ -103,22 +103,10 @@ const validateRestaurantData = (req, res, next) => {
 
 const validateNewOrderData = async (req, res, next) => {
   const restaurantData = await Restaurant.getAllRestaurantData();
-  const userData = await User.getAllUserData();
 
   let newOrder = JSON.parse(req.body);
-  const { user_id, restaurant_id, order_list, location } = newOrder;
+  const { restaurant_id, order_list, location } = newOrder;
   const errors = {};
-
-  if (!user_id) {
-    errors.user_id = "User ID is not provided";
-  } else {
-    const userIndex = userData.data.findIndex(
-      (user) => user.user_id === newOrder.user_id
-    );
-    if (userIndex == -1) {
-      errors.user_id = "User ID not found";
-    }
-  }
 
   if (!restaurant_id) {
     errors.restaurant_id = "Restaurant ID is not provided";
@@ -154,4 +142,4 @@ const validateNewOrderData = async (req, res, next) => {
   next();
 };
 
-module.exports = {validateRestaurantData, validateNewOrderData};
+module.exports = { validateRestaurantData, validateNewOrderData };
