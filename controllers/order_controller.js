@@ -22,7 +22,7 @@ class OrderController {
 
   async getOrderById(req, res) {
     try {
-      const { id, restaurant_id, user_id } = req.query;
+      const { id, restaurant_id } = req.query;
 
       if (id !== undefined) {
         const result = await Order.getOrderById(id);
@@ -42,6 +42,25 @@ class OrderController {
         failure(res, 400, "Failed to connect", "Request not found");
       }
     } catch (err) {
+      failure(res, 500, "Failed to get data", "Internal Server Error");
+    }
+  }
+
+  async getOrderByRestaurantId(req, res){
+    try {
+      const authHeader = req.header("Authorization");
+      const token = authHeader.substring(7);
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      const id = decodedToken.restaurant.id;
+
+      const result = await Order.getRestaurantOrder(id);
+      if (result.success) {
+        success(res, "Successfully Received.", result.data);
+      } else {
+        failure(res, result.code, "Failed to get data", result.error);
+      }
+    } catch (err) {
+      console.log(err);
       failure(res, 500, "Failed to get data", "Internal Server Error");
     }
   }

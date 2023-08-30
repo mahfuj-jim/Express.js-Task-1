@@ -24,7 +24,7 @@ async function authenticateRestaurant(req, res, next) {
       return failure(res, 403, "Error Occurred", "Invalid Token");
     }
 
-    if(JSON.parse(req.body).id){
+    if (JSON.parse(req.body).id) {
       return failure(res, 400, "Error Occurred", "Shouldn't Containt ID");
     }
 
@@ -39,7 +39,11 @@ async function authenticateRestaurant(req, res, next) {
     }
 
     const { restaurantId } = req.params;
-    if (restaurantId == "" || restaurantId != restaurant.id) {
+    if (
+      Object.keys(req.params).length !== 0 &&
+      (restaurantId == "" || restaurantId != restaurant.id)
+    ) {
+      console.log(restaurantId);
       return failure(res, 403, "Error Occurred", "Invalid Restaurant");
     }
 
@@ -69,8 +73,8 @@ async function validateRestaurantReview(req, res, next) {
     if (role == "restaurant") {
       const restaurant = decodedToken.restaurant;
 
-      if (restaurant.id != res.query.restaurantId) {
-        return failure(res, 403, "Error Occurred", "Invalid Restaurant");
+      if (restaurant.id != req.query.restaurantId) {
+        return failure(res, 403, "Error Occurred", "Invalid Token");
       }
     }
 

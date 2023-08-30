@@ -134,23 +134,9 @@ class Order {
         (order) => order.restaurant_id == restaurant_id
       );
 
-      const responseRestaurantData = await Restaurant.getAllRestaurantData();
-      const restaurantData = responseRestaurantData.data;
-      const restaurantIndex = restaurantData.findIndex(
-        (item) => item.id == restaurant_id
-      );
-
-      if (restaurantIndex != -1) {
-        if (typeof orders != "undefined") {
-          writeToLogFile(`Get Order for Restaurant ID ${restaurant_id}`);
-          return { success: true, data: orders };
-        } else {
-          return {
-            success: false,
-            code: 400,
-            error: "Restaurant ID is Not Valid",
-          };
-        }
+      if (typeof orders != "undefined") {
+        writeToLogFile(`Get Order for Restaurant ID ${restaurant_id}`);
+        return { success: true, data: orders };
       } else {
         return {
           success: false,
