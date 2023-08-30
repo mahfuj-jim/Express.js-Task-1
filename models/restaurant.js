@@ -174,7 +174,7 @@ class Restaurant {
     }
   }
 
-  async createRestaurantReview(restaurant_id, review) {
+  async createRestaurantReview(restaurant_id, user_id, review) {
     try {
       const responseData = await this.getAllRestaurantData();
       const restaurantData = responseData.data;
@@ -184,48 +184,38 @@ class Restaurant {
       );
 
       if (restaurantIndex != -1) {
-        const responseUserData = await User.getAllUserData();
-        const userData = responseUserData.data;
+        const currentReviews = restaurantData[restaurantIndex].reviews;
+        const newReview = {
+          id: currentReviews[currentReviews.length - 1].id + 1,
+          userId: user_id,
+          ...review,
+        };
+        currentReviews.push(newReview);
+        restaurantData[restaurantIndex].reviews = currentReviews;
 
-        const userIndex = userData.findIndex(
-          (user) => user.user_id == review.userId
+        let numberOfRating = 0;
+        let totalRating = 0;
+
+        currentReviews.map((item) => {
+          numberOfRating++;
+          totalRating += item.rating;
+        });
+
+        restaurantData[restaurantIndex] = {
+          ...restaurantData[restaurantIndex],
+          ...{ rating: totalRating / numberOfRating },
+        };
+
+        await fsPromise.writeFile(
+          this.restaurantFilePath,
+          JSON.stringify(restaurantData),
+          "utf-8"
+        );
+        writeToLogFile(
+          `Create new Review for Restaurant with ID ${restaurant_id}`
         );
 
-        if (userIndex != 1) {
-          const currentReviews = restaurantData[restaurantIndex].reviews;
-          const newReview = {
-            id: currentReviews[currentReviews.length - 1].id + 1,
-            ...review,
-          };
-          currentReviews.push(newReview);
-          restaurantData[restaurantIndex].reviews = currentReviews;
-
-          let numberOfRating = 0;
-          let totalRating = 0;
-
-          currentReviews.map((item) => {
-            numberOfRating++;
-            totalRating += item.rating;
-          });
-
-          restaurantData[restaurantIndex] = {
-            ...restaurantData[restaurantIndex],
-            ...{ rating: totalRating / numberOfRating },
-          };
-
-          await fsPromise.writeFile(
-            this.restaurantFilePath,
-            JSON.stringify(restaurantData),
-            "utf-8"
-          );
-          writeToLogFile(
-            `Create new Review for Restaurant with ID ${restaurant_id}`
-          );
-
-          return { success: true, data: newReview };
-        } else {
-          return { success: false, code: 400, error: "User is Not Valid" };
-        }
+        return { success: true, data: newReview };
       } else {
         return { success: false, code: 400, error: "Restaurant is Not Valid" };
       }

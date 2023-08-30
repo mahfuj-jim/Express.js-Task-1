@@ -170,26 +170,14 @@ class Order {
       const orderData = responseData.data;
       const orders = orderData.filter((order) => order.user_id == user_id);
 
-      const responseUserData = await User.getAllUserData();
-      const userData = responseUserData.data;
-      const userIndex = userData.findIndex((item) => item.user_id == user_id);
-
-      if (userIndex != -1) {
-        if (typeof orders != "undefined") {
-          writeToLogFile(`Get Order for User ID ${user_id}`);
-          return { success: true, data: orders };
-        } else {
-          return {
-            success: false,
-            code: 500,
-            error: "Internal Server Error",
-          };
-        }
+      if (typeof orders != "undefined") {
+        writeToLogFile(`Get Order for User ID ${user_id}`);
+        return { success: true, data: orders };
       } else {
         return {
           success: false,
-          code: 400,
-          error: "User ID is Not Valid",
+          code: 500,
+          error: "Internal Server Error",
         };
       }
     } catch (err) {

@@ -1,5 +1,6 @@
 const RestaurantController = require("../controllers/restaurant_controller.js");
 const {validateRestaurantData} = require("../middleware/validator.js");
+const {authenticateUser} = require("../middleware/user_validator.js");
 const express = require("express");
 const routes = express.Router();
 
@@ -9,6 +10,6 @@ routes.post("/create", validateRestaurantData, RestaurantController.createRestau
 routes.patch("/update/:restaurantId", validateRestaurantData, RestaurantController.updateRestaurant);
 routes.delete("/delete/:restaurantId", RestaurantController.deleteRestaurantById);
 routes.get("/review", RestaurantController.getRestaurantReview);
-routes.post("/review", RestaurantController.createRestaurantReview); 
+routes.post("/review", authenticateUser, RestaurantController.createRestaurantReview); 
 
 module.exports = routes;

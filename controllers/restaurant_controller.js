@@ -1,5 +1,9 @@
 const { success, failure } = require("../util/common.js");
 const Restaurant = require("../models/restaurant.js");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 class RestaurantController {
   async getAllRestaurantData(req, res) {
@@ -108,9 +112,15 @@ class RestaurantController {
 
   async createRestaurantReview(req, res) {
     try {
+      const authHeader = req.header("Authorization");
+      const token = authHeader.substring(7);
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      const user_id = decodedToken.user.user_id;
+
       const { restaurantId } = req.query;
       const result = await Restaurant.createRestaurantReview(
         restaurantId,
+        user_id,
         JSON.parse(req.body)
       );
 
