@@ -80,19 +80,6 @@ class UserController {
       const { email, password } = JSON.parse(req.body);
 
       const user = await User.findByEmail(email);
-      if (!user) {
-        return failure(
-          res,
-          401,
-          "Authentication failed",
-          "Email Doesn't Exist"
-        );
-      }
-
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return failure(res, 401, "Authentication failed", "Wrong Password");
-      }
 
       const token = jwt.sign(
         {
