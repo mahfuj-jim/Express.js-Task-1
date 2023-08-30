@@ -1,6 +1,37 @@
 const { failure } = require("../util/common.js");
 const Restaurant = require("../models/restaurant.js");
 const User = require("../models/user.js");
+// const { body } = require("express-validator");
+
+// const validator = {
+//   create: [
+//     body("name")
+//       .exists()
+//       .withMessage("Name was not provided")
+//       .isString()
+//       .withMessage("Name must be a string"),
+//     body("openHours").exists().withMessage("Open Hours was not provided"),
+//     body("deliveryOptions")
+//       .exists()
+//       .withMessage("Delivery Options was not provided")
+//       .not()
+//       .custom((value) => {
+//         const { deliveryArea, deliveryFee } = value;
+
+//         if (!deliveryArea || deliveryArea === "" || deliveryArea.length == 0) {
+//           throw new Error("Delivery Area was not provided");
+//         }
+
+//         if (!deliveryFee || deliveryFee === "") {
+//           errors.deliveryFee = "Delivery Fee is not provided";
+//         } else if (deliveryFee > 100) {
+//           errors.deliveryFee = "Delivery Fee should not more than 100";
+//         }
+
+//         return true;
+//       }),
+//   ],
+// };
 
 const validateRestaurantData = (req, res, next) => {
   let newRestaurant = JSON.parse(req.body);
@@ -123,4 +154,4 @@ const validateNewOrderData = async (req, res, next) => {
   next();
 };
 
-module.exports = { validateRestaurantData, validateNewOrderData };
+module.exports = {validateRestaurantData, validateNewOrderData};
