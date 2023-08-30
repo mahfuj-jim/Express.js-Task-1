@@ -12,4 +12,7 @@ routes.delete("/delete/:restaurantId", RestaurantController.deleteRestaurantById
 routes.get("/review", RestaurantController.getRestaurantReview);
 routes.post("/review", authenticateUser, RestaurantController.createRestaurantReview); 
 
+// auth
+routes.post('/login', RestaurantController.login);
+
 module.exports = routes;

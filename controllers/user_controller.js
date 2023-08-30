@@ -77,7 +77,7 @@ class UserController {
 
   async login(req, res) {
     try {
-      const { email, password } = JSON.parse(req.body);
+      const { email } = JSON.parse(req.body);
 
       const user = await User.findByEmail(email);
 

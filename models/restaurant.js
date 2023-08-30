@@ -224,6 +224,18 @@ class Restaurant {
       return { success: false, code: 500, error: "Internal Server Issue" };
     }
   }
+
+  async findByEmail(email) {
+    try {
+      const responseData = await this.getAllRestaurantData();
+      const restaurantData = responseData.data;
+
+      const restaurant = restaurantData.find((item) => item.email === email);
+      return restaurant;
+    } catch (err) {
+      return { success: false, code: 500, error: "Internal Server Issue" };
+    }
+  }
 }
 
 module.exports = new Restaurant();

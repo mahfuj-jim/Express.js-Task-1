@@ -134,6 +134,48 @@ class RestaurantController {
       failure(res, 500, "Failed to add review", "Internal Server Error");
     }
   }
+
+  async login(req, res) {
+    try {
+      const { email } = JSON.parse(req.body);
+
+      const restaurant = await Restaurant.findByEmail(email);
+
+      const token = jwt.sign(
+        {
+          restaurant: {
+            id: restaurant.id,
+            name: restaurant.name,
+            location: restaurant.location,
+            cuisine: restaurant.cuisine,
+            rating: restaurant.rating,
+            contactNumber: restaurant.contactNumber,
+            owner: restaurant.owner,
+            email: restaurant.email
+          },
+          role: "restaurant",
+        },
+        process.env.ACCESS_TOKEN_SECRET
+      );
+
+      return success(res, "Authentication successful", {
+        token,
+        restaurant: {
+          id: restaurant.id,
+          name: restaurant.name,
+          location: restaurant.location,
+          cuisine: restaurant.cuisine,
+          rating: restaurant.rating,
+          contactNumber: restaurant.contactNumber,
+          owner: restaurant.owner,
+          email: restaurant.email
+        },
+      });
+    } catch (err) {
+      console.log(err);
+      failure(res, 500, "Login failed", "Internal Server Issue");
+    }
+  }
 }
 
 module.exports = new RestaurantController();
