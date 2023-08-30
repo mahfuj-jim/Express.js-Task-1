@@ -53,13 +53,13 @@ async function userLoginValidation(req, res, next) {
     errors.password = "Password was not provided";
   }
 
-  if (Object.keys(errors).length > 0) {
-    return failure(res, 422, "Invalid Input", errors);
-  }
-
   const user = await User.findByEmail(email);
   if (!user) {
-    return failure(res, 401, "Authentication failed", "Email Doesn't Exist");
+    errors.email = "Email Doesn't Exist";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return failure(res, 422, "Invalid Input", errors);
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -70,4 +70,45 @@ async function userLoginValidation(req, res, next) {
   next();
 }
 
-module.exports = { authenticateUser, userLoginValidation };
+async function userSignupValidation(req, res, next) {
+  const { name, email, password, phoneNumber, location } = JSON.parse(req.body);
+
+  const errors = {};
+
+  if (!email || email === "") {
+    errors.email = "Email was not provided";
+  } else {
+    const user = await User.findByEmail(email);
+    if (user) {
+      errors.email = "Email Already Exists";
+    }
+  }
+
+  if (!name || name === "") {
+    errors.name = "Name was not provided";
+  }
+
+  if (!password || password === "") {
+    errors.password = "Password was not provided";
+  }
+
+  if (!phoneNumber || phoneNumber === "") {
+    errors.phoneNumber = "Phone Number was not provided";
+  }
+
+  if (!location || location === "") {
+    errors.password = "Location was not provided";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return failure(res, 422, "Invalid Input", errors);
+  }
+
+  next();
+}
+
+module.exports = {
+  authenticateUser,
+  userLoginValidation,
+  userSignupValidation,
+};
