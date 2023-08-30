@@ -3,7 +3,6 @@ const User = require("../models/user.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-const { use } = require("../routes/restaurant_route.js");
 
 dotenv.config();
 
@@ -84,6 +83,9 @@ class UserController {
         );
       }
 
+      const hashedPassword = await bcrypt.hash(password, 10);
+      console.log(hashedPassword);
+
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
         return failure(res, 401, "Authentication failed", "Wrong Password");
@@ -106,7 +108,7 @@ class UserController {
       return success(res, "Authentication successful", {
         token,
         user: {
-         user_id: user.user_id,
+          user_id: user.user_id,
           name: user.name,
           email: user.email,
           phone_number: user.phoneNumber,
