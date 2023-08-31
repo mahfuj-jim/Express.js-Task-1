@@ -36,14 +36,18 @@ class RestaurantController {
       const { restaurantId } = req.params;
       RestaurantModel.findOne({ _id: restaurantId }, { password: false })
         .then((restaurant) => {
-          success(res, "Successfully Received.", restaurant);
+          return success(res, "Successfully Received.", restaurant);
         })
         .catch((error) => {
-          console.log(error);
-          failure(res, 400, "Failed to get data", "Restaurant not found");
+          return failure(
+            res,
+            400,
+            "Failed to get data",
+            "Restaurant not found"
+          );
         });
     } catch (err) {
-      failure(res, 500, "Failed to get data", "Internal Server Issue");
+      return failure(res, 500, "Failed to get data", "Internal Server Issue");
     }
   }
 
@@ -79,39 +83,79 @@ class RestaurantController {
     }
   }
 
-  // async updateRestaurant(req, res) {
-  //   try {
-  //     const { restaurantId } = req.params;
+  async updateRestaurant(req, res) {
+    try {
+      const { restaurantId } = req.params;
 
-  //     const result = await Restaurant.updateRestaurant(
-  //       restaurantId,
-  //       JSON.parse(req.body)
-  //     );
+      RestaurantModel.findOne({ _id: restaurantId })
+        .then((restaurant) => {
+          RestaurantModel.updateOne({ _id: restaurantId }, JSON.parse(req.body))
+            .then((updatedRestaurant) => {
+              return success(
+                res,
+                "Successfully Updated.",
+                JSON.parse(req.body)
+              );
+            })
+            .catch((error) => {
+              return failure(
+                res,
+                500,
+                "Failed to Update",
+                "Internal Server Issue"
+              );
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+          return failure(
+            res,
+            400,
+            "Failed to get data",
+            "Restaurant not found"
+          );
+        });
+    } catch (err) {
+      failure(res, 500, "Failed to update data", "Internal Server Issue");
+    }
+  }
 
-  //     if (result.success) {
-  //       success(res, "Successfully Updated.", result.data);
-  //     } else {
-  //       failure(res, result.code, "Failed to update data", result.error);
-  //     }
-  //   } catch (err) {
-  //     failure(res, 500, "Failed to update data", "Internal Server Issue");
-  //   }
-  // }
+  async deleteRestaurantById(req, res) {
+    try {
+      const { restaurantId } = req.params;
 
-  // async deleteRestaurantById(req, res) {
-  //   try {
-  //     const { restaurantId } = req.params;
-
-  //     const result = await Restaurant.deleteRestaurantById(restaurantId);
-  //     if (result.success) {
-  //       success(res, "Successfully Deleted.", result.data);
-  //     } else {
-  //       failure(res, result.code, "Failed to delete data", result.error);
-  //     }
-  //   } catch (err) {
-  //     failure(res, 500, "Failed to delete data", "Internal Server Issue");
-  //   }
-  // }
+      RestaurantModel.findOne({ _id: restaurantId })
+        .then((restaurant) => {
+          RestaurantModel.deleteOne({ _id: restaurantId })
+            .then((deleteed) => {
+              return success(
+                res,
+                "Successfully Executed",
+                `Delete Restaurant with ID ${restaurantId}`
+              );
+            })
+            .catch((error) => {
+              return failure(
+                res,
+                500,
+                "Failed to Update",
+                "Internal Server Issue"
+              );
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+          return failure(
+            res,
+            400,
+            "Failed to get data",
+            "Restaurant not found"
+          );
+        });
+    } catch (err) {
+      failure(res, 500, "Failed to delete data", "Internal Server Issue");
+    }
+  }
 
   // async getRestaurantReview(req, res) {
   //   try {
@@ -153,47 +197,55 @@ class RestaurantController {
   //   }
   // }
 
-  // async login(req, res) {
-  //   try {
-  //     const { email } = JSON.parse(req.body);
+  async login(req, res) {
+    try {
+      const { email, password } = JSON.parse(req.body);
 
-  //     const restaurant = await Restaurant.findByEmail(email);
+      RestaurantModel.findOne({ email }).then( async (restaurant) => {
+        const isPasswordValid = await bcrypt.compare(password, restaurant.password);
 
-  //     const token = jwt.sign(
-  //       {
-  //         restaurant: {
-  //           id: restaurant.id,
-  //           name: restaurant.name,
-  //           location: restaurant.location,
-  //           cuisine: restaurant.cuisine,
-  //           rating: restaurant.rating,
-  //           contactNumber: restaurant.contactNumber,
-  //           owner: restaurant.owner,
-  //           email: restaurant.email,
-  //         },
-  //         role: "restaurant",
-  //       },
-  //       process.env.ACCESS_TOKEN_SECRET
-  //     );
+      if (!isPasswordValid) {
+        return failure(res, 401, "Login failed", "Invalid password");
+      }
 
-  //     return success(res, "Authentication successful", {
-  //       token,
-  //       restaurant: {
-  //         id: restaurant.id,
-  //         name: restaurant.name,
-  //         location: restaurant.location,
-  //         cuisine: restaurant.cuisine,
-  //         rating: restaurant.rating,
-  //         contactNumber: restaurant.contactNumber,
-  //         owner: restaurant.owner,
-  //         email: restaurant.email,
-  //       },
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //     failure(res, 500, "Login failed", "Internal Server Issue");
-  //   }
-  // }
+      const token = jwt.sign(
+        {
+          restaurant: {
+            id: restaurant._id,
+            name: restaurant.name,
+            location: restaurant.location,
+            cuisine: restaurant.cuisine,
+            rating: restaurant.rating,
+            contactNumber: restaurant.contactNumber,
+            owner: restaurant.owner,
+            email: restaurant.email,
+          },
+          role: "restaurant",
+        },
+        process.env.ACCESS_TOKEN_SECRET
+      );
+
+      return success(res, "Authentication successful", {
+        token,
+        restaurant: {
+          id: restaurant._id,
+          name: restaurant.name,
+          location: restaurant.location,
+          cuisine: restaurant.cuisine,
+          rating: restaurant.rating,
+          contactNumber: restaurant.contactNumber,
+          owner: restaurant.owner,
+          email: restaurant.email,
+        },
+      });
+      }).catch(error => {
+        return failure(res, 401, "Login failed", "Restaurant not found");
+      });
+    } catch (err) {
+      console.log(err);
+      failure(res, 500, "Login failed", "Internal Server Issue");
+    }
+  }
 }
 
 module.exports = new RestaurantController();
