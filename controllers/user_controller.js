@@ -89,7 +89,7 @@ class UserController {
           const token = jwt.sign(
             {
               user: {
-                user_id: user.user_id,
+                _id: user._id,
                 name: user.name,
                 email: user.email,
                 phone_number: user.phoneNumber,
@@ -103,7 +103,7 @@ class UserController {
           return success(res, "Authentication successful", {
             token,
             user: {
-              user_id: user.user_id,
+              _id: user._id,
               name: user.name,
               email: user.email,
               phone_number: user.phoneNumber,
