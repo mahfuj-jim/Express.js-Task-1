@@ -47,34 +47,37 @@ class RestaurantController {
     }
   }
 
-  // async createRestaurant(req, res) {
-  //   try {
-  //     let restaurant = JSON.parse(req.body);
-  //     const hashedPassword = await bcrypt.hash(restaurant.password, 10);
-  //     restaurant = { ...restaurant, password: hashedPassword };
+  async createRestaurant(req, res) {
+    try {
+      let restaurant = JSON.parse(req.body);
 
-  //     const result = await Restaurant.createRestaurant(restaurant);
+      const hashedPassword = await bcrypt.hash(restaurant.password, 10);
+      restaurant = { ...restaurant, password: hashedPassword };
 
-  //     if (result.success) {
-  //       success(res, "Successfully Created.", result.data);
-  //     } else {
-  //       failure(
-  //         res,
-  //         result.code,
-  //         "Failed to create new restaurant",
-  //         result.error
-  //       );
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //     failure(
-  //       res,
-  //       500,
-  //       "Failed to create new restaurant",
-  //       "Internal Server Issue"
-  //     );
-  //   }
-  // }
+      RestaurantModel.create(restaurant)
+        .then((createdRestaurant) => {
+          createdRestaurant.password = undefined;
+          return success(res, "Successfully Created.", createdRestaurant);
+        })
+        .catch((error) => {
+          console.log(error);
+          return failure(
+            res,
+            500,
+            "Failed to create new restaurant",
+            "Internal Server Issue"
+          );
+        });
+    } catch (err) {
+      console.log(err);
+      failure(
+        res,
+        500,
+        "Failed to create new restaurant",
+        "Internal Server Issue"
+      );
+    }
+  }
 
   // async updateRestaurant(req, res) {
   //   try {

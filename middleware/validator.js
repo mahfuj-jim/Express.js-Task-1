@@ -1,76 +1,76 @@
 const { failure } = require("../util/common.js");
 
 const validateRestaurantData = (req, res, next) => {
-  // let newRestaurant = JSON.parse(req.body);
+  let newRestaurant = JSON.parse(req.body);
 
-  // const {
-  //   name,
-  //   openHours,
-  //   deliveryOptions,
-  //   location,
-  //   cuisine,
-  //   contactNumber,
-  //   owner,
-  //   password,
-  // } = newRestaurant;
+  const {
+    name,
+    openHours,
+    deliveryOptions,
+    location,
+    cuisine,
+    contactNumber,
+    owner,
+    password,
+  } = newRestaurant;
 
-  // const errors = {};
+  const errors = {};
 
-  // if (!name || name === "") {
-  //   errors.name = "Name was not provided";
-  // }
+  if (!name || name === "") {
+    errors.name = "Name was not provided";
+  }
 
-  // if (!openHours || openHours === "") {
-  //   errors.openHours = "Open Hour was not provided";
-  // } else {
-  //   const { weekdays, weekends } = openHours;
+  if (!openHours || openHours === "") {
+    errors.openHours = "Open Hour was not provided";
+  } else {
+    const { weekdays, weekends } = openHours;
 
-  //   if (!weekends || weekends === "" || !weekdays || weekdays === "") {
-  //     errors.openHours = "Open Hour was not provided Accurately";
-  //   }
-  // }
+    if (!weekends || weekends === "" || !weekdays || weekdays === "") {
+      errors.openHours = "Open Hour was not provided Accurately";
+    }
+  }
 
-  // if (!deliveryOptions || deliveryOptions === "") {
-  //   errors.openHours = "Delivery Options was not provided Accurately";
-  // } else {
-  //   const { deliveryArea, deliveryFee } = deliveryOptions;
+  if (!deliveryOptions || deliveryOptions === "") {
+    errors.openHours = "Delivery Options was not provided Accurately";
+  } else {
+    const { deliveryArea, deliveryFee } = deliveryOptions;
 
-  //   if (!deliveryArea || deliveryArea === "" || deliveryArea.length == 0) {
-  //     errors.deliveryArea = "Delivery Area was not provided";
-  //   }
+    if (!deliveryArea || deliveryArea === "" || deliveryArea.length == 0) {
+      errors.deliveryArea = "Delivery Area was not provided";
+    }
 
-  //   if (!deliveryFee || deliveryFee === "") {
-  //     errors.deliveryFee = "Delivery Fee is not provided";
-  //   } else if (deliveryFee > 100) {
-  //     errors.deliveryFee = "Delivery Fee should not more than 100";
-  //   }
-  // }
+    if (!deliveryFee || deliveryFee === "") {
+      errors.deliveryFee = "Delivery Fee is not provided";
+    } else if (deliveryFee > 100) {
+      errors.deliveryFee = "Delivery Fee should not more than 100";
+    }
+  }
 
-  // if (!location || location === "") {
-  //   errors.location = "Location was not provided";
-  // }
+  if (!location || location === "") {
+    errors.location = "Location was not provided";
+  }
 
-  // if (!cuisine || cuisine === "") {
-  //   errors.location = "Cuisine was not provided";
-  // }
+  if (!cuisine || cuisine === "") {
+    errors.location = "Cuisine was not provided";
+  }
 
-  // if (!contactNumber || contactNumber === "") {
-  //   errors.location = "Contact Number was not provided";
-  // }
+  if (!contactNumber || contactNumber === "") {
+    errors.location = "Contact Number was not provided";
+  }
 
-  // if (!owner || owner === "") {
-  //   errors.owner = "Owner was not provided";
-  // }
+  if (!owner || owner === "") {
+    errors.owner = "Owner was not provided";
+  }
 
-  // if (!password || password === "") {
-  //   errors.password = "Password was not provided";
-  // }else if(password.length < 8){
-  //   errors.password = "Password must be 8 or more characters";
-  // }
+  if (!password || password === "") {
+    errors.password = "Password was not provided";
+  }else if(password.length < 8){
+    errors.password = "Password must be 8 or more characters";
+  }
 
-  // if (Object.keys(errors).length > 0) {
-  //   return failure(res, 422, "Invalid Input", errors);
-  // }
+  if (Object.keys(errors).length > 0) {
+    return failure(res, 422, "Invalid Input", errors);
+  }
 
   next();
 };
