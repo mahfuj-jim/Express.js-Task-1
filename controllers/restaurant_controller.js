@@ -34,14 +34,14 @@ class RestaurantController {
   async getRestaurantById(req, res) {
     try {
       const { restaurantId } = req.params;
-      console.log(restaurantId);
-      const result = await Restaurant.getRestaurantById(restaurantId);
-
-      if (result.success) {
-        success(res, "Successfully Received.", result.data);
-      } else {
-        failure(res, result.code, "Failed to get data", result.error);
-      }
+      RestaurantModel.findOne({ _id: restaurantId }, { password: false })
+        .then((restaurant) => {
+          success(res, "Successfully Received.", restaurant);
+        })
+        .catch((error) => {
+          console.log(error);
+          failure(res, 400, "Failed to get data", "Restaurant not found");
+        });
     } catch (err) {
       failure(res, 500, "Failed to get data", "Internal Server Issue");
     }
