@@ -65,6 +65,7 @@ class UserController {
           });
         })
         .catch((error) => {
+          console.log(error);
           failure(res, 500, "Failed to register user", "Internal Server Issue");
         });
     } catch (err) {
