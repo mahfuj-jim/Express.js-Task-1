@@ -1,5 +1,6 @@
 const { success, failure } = require("../util/common.js");
-const User = require("../models/user.js");
+// const User = require("../models/user.js");
+const UserModel = require("../models/user_model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -9,12 +10,8 @@ dotenv.config();
 class UserController {
   async getAllUserData(req, res) {
     try {
-      const result = await User.getAllUserData(true);
-      if (result.success) {
-        success(res, "Successfully Received User Data.", result.data);
-      } else {
-        failure(res, result.code, "Failed to get user data", result.error);
-      }
+      const users = await UserModel.find({}, {password: false});
+      success(res, "Successfully Received User Data.", users);
     } catch (err) {
       failure(res, 500, "Failed to get user data", "Internal Server Issue");
     }

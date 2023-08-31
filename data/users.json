@@ -6,7 +6,7 @@
         "password": "$2b$10$8LVUe3f5Xme/1oLaQNJs3eDl7AgyGmnF8YW9LN1TOsrLZm5gA4PDW",
         "phoneNumber": "01700000000",
         "location": "Gulshan",
-        "favourtieRestaurant": [
+        "favouriteRestaurant": [
             3,
             4,
             5
