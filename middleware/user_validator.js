@@ -1,5 +1,6 @@
 const { failure } = require("../util/common.js");
 const User = require("../models/user.js");
+const UserModel = require("../models/user_model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -78,9 +79,10 @@ async function userSignupValidation(req, res, next) {
   if (!email || email === "") {
     errors.email = "Email was not provided";
   } else {
-    const user = await User.findByEmail(email);
-    if (user) {
-      errors.email = "Email Already Exists";
+    const newUser = JSON.parse(req.body);
+    const existingUser = await UserModel.findOne({ email: newUser.email });
+    if (existingUser) {
+      errors.email = "Email Already Exist";
     }
   }
 
