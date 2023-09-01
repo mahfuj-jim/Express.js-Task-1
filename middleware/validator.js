@@ -78,20 +78,19 @@ const validateRestaurantData = (req, res, next) => {
 
 const validateNewOrderData = async (req, res, next) => {
   let newOrder = JSON.parse(req.body);
-  const { restaurant_id, order_list, location } = newOrder;
+  const { restaurant, order_list, location } = newOrder;
 
   const errors = {};
-  let restaurant;
+  let restaurantData;
 
-  if (!restaurant_id) {
+  if (!restaurant) {
     errors.restaurant = "Restaurant ID is not provided";
   } else {
-    await RestaurantModel.findOne({ _id: restaurant_id }, { password: false })
+    await RestaurantModel.findOne({ _id: restaurant }, { password: false })
       .then((restaurantDetails) => {
-        restaurant = restaurantDetails;
+        restaurantData = restaurantDetails;
       })
       .catch((error) => {
-        console.log("Error");
         errors.restaurant = "Invalid Restaurant ID";
       });
   }
@@ -100,7 +99,9 @@ const validateNewOrderData = async (req, res, next) => {
     errors.order_list = "Order List is not provided";
   } else {
     try {
-      const menuIdSet = new Set(restaurant.menu.map((menuItem) => menuItem.id));
+      const menuIdSet = new Set(
+        restaurantData.menu.map((menuItem) => menuItem.id)
+      );
       const invalidMenuIds = [];
       let totalOrderItems = 0;
 
@@ -136,12 +137,14 @@ const validateNewOrderData = async (req, res, next) => {
   if (!location || location === "") {
     errors.location = "Location is not provided";
   } else {
-    const isContained =
-      restaurant.deliveryOptions.deliveryArea.includes(location);
+    try {
+      const isContained =
+        restaurantData.deliveryOptions.deliveryArea.includes(location);
 
-    if (!isContained) {
-      errors.location = "Delivery is not available in your area";
-    }
+      if (!isContained) {
+        errors.location = "Delivery is not available in your area";
+      }
+    } catch (err) {}
   }
 
   if (Object.keys(errors).length > 0) {

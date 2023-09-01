@@ -3,15 +3,12 @@ const mongoose = require("mongoose");
 const orderSchema = new mongoose.Schema({
   time: {
     type: Date,
-    required: true,
   },
   order_status: {
     type: String,
-    required: true,
   },
   delivery_fee: {
     type: Number,
-    required: true,
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -27,15 +24,12 @@ const orderSchema = new mongoose.Schema({
     {
       dish_name: {
         type: String,
-        required: true,
       },
       price: {
         type: Number,
-        required: true,
       },
       quantity: {
         type: Number,
-        required: true,
       },
     },
   ],

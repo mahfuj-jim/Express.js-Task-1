@@ -1,5 +1,6 @@
 const { success, failure } = require("../util/common.js");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 const OrderModel = require("../models/order_models.js");
 
 class OrderController {
@@ -149,7 +150,37 @@ class OrderController {
   }
 
   async createOrder(req, res) {
-    failure(res, 500, "Failed to get data", "Internal Server Issue");
+    try {
+      const authHeader = req.header("Authorization");
+      const token = authHeader.substring(7);
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      const user_id = decodedToken.user._id;
+
+      let order = JSON.parse(req.body);
+      order = { ...order, user: user_id };
+
+      await OrderModel.create(order)
+        .then((newOrder) => {
+          return success(res, "Successfully Created.", newOrder);
+        })
+        .catch((err) => {
+          console.log(err);
+          return failure(
+            res,
+            500,
+            "Failed to create new order",
+            "Internal Server Issue"
+          );
+        });
+    } catch (err) {
+      console.log(err);
+      return failure(
+        res,
+        500,
+        "Failed to create new order",
+        "Internal Server Issue"
+      );
+    }
   }
 }
 
