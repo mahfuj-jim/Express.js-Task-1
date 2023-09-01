@@ -2,10 +2,12 @@ const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
   time: {
-    type: Date,
+    type: String,
+    require: true,
   },
   order_status: {
     type: String,
+    require: true,
   },
   delivery_fee: {
     type: Number,

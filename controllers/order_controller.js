@@ -1,6 +1,8 @@
 const { success, failure } = require("../util/common.js");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const { getCurrentDateTime } = require("../util/common.js");
+const RestaurantModel = require("../models/restaurant_model.js");
 const OrderModel = require("../models/order_models.js");
 
 class OrderController {
@@ -157,7 +159,20 @@ class OrderController {
       const user_id = decodedToken.user._id;
 
       let order = JSON.parse(req.body);
-      order = { ...order, user: user_id };
+
+      const restaurantId = order.restaurant;
+      const delivery_options = await RestaurantModel.findOne(
+        { _id: new mongoose.Types.ObjectId(restaurantId) },
+        { "deliveryOptions.deliveryFee": 1, _id: 0 }
+      );
+
+      order = {
+        ...order,
+        user: user_id,
+        deliveryFee: delivery_options.deliveryOptions.deliveryFee,
+        time: getCurrentDateTime(),
+        order_status: "On Process",
+      };
 
       await OrderModel.create(order)
         .then((newOrder) => {
