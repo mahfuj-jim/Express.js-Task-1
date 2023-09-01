@@ -5,6 +5,25 @@
 
 // dotenv.config();
 
+const { success, failure } = require("../util/common.js");
+const OrderModel = require("../models/order_models.js");
+
+class OrderController{
+    async getAllOrderData(req, res) {
+        try {
+          const orders = await OrderModel.find({});
+      
+          if (orders.length > 0) {
+            success(res, "Successfully Received.", orders);
+          } else {
+            failure(res, 404, "No order data found.", "No orders available.");
+          }
+        } catch (error) {
+          failure(res, 500, "Failed to get data", "Internal Server Issue");
+        }
+      }
+}
+
 // class OrderController {
 //   async getAllOrderData(req, res) {
 //     try {
@@ -125,4 +144,4 @@
 //   }
 // }
 
-// module.exports = new OrderController();
+module.exports = new OrderController();

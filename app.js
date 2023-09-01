@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/restaurant", restaurantRoutes);
 app.use("/user", userRoutes);
-// app.use("/order", orderRoutes);
+app.use("/order", orderRoutes);
 
 app.use((req, res) => {
   failure(res, 400, "Not Found", "Request not found");
