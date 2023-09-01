@@ -9,10 +9,8 @@ class OrderController {
   async getAllOrderData(req, res) {
     try {
       const status = req.query.onProccessOrder;
-
       const filter = {};
-
-      if (status == true) {
+      if (status == 'true') {
         filter.order_status = "On Process";
       }
 
@@ -76,7 +74,10 @@ class OrderController {
       ]);
 
       if (orders) {
-        success(res, "Successfully Received.", orders);
+        success(res, "Successfully Received.", {
+          total_orders: orders.length,
+          orders: orders,
+        });
       } else {
         failure(res, 500, "Failed to get data.", "Internal Server Issue");
       }
@@ -219,7 +220,7 @@ class OrderController {
         restaurant: restaurantId,
       };
 
-      if (status == true) {
+      if (status == 'true') {
         filter.order_status = "On Process";
       }
 
