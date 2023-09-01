@@ -11,6 +11,6 @@ routes.get("/all/:orderId", OrderController.getOrderById);
 // routes.get("/restaurant", authenticateRestaurant, OrderController.getOrderByRestaurantId);
 // routes.get("/user",  authenticateUser, OrderController.getOrderByUserID);
 // routes.patch("/status", OrderController.completeOrder);
-// routes.post("/create", authenticateUser, validateNewOrderData, OrderController.createOrder);
+routes.post("/create", authenticateUser, validateNewOrderData, OrderController.createOrder);
 
 module.exports = routes;

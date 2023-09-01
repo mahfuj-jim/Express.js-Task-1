@@ -15,13 +15,13 @@ async function authenticateRestaurant(req, res, next) {
   const token = authHeader.substring(7);
 
   try {
-    // const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    // const role = decodedToken.role;
-    // const restaurant = decodedToken.restaurant;
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const role = decodedToken.role;
+    const restaurant = decodedToken.restaurant;
 
-    // if (role != "restaurant") {
-    //   return failure(res, 403, "Error Occurred", "Invalid Token");
-    // }
+    if (role != "restaurant") {
+      return failure(res, 403, "Error Occurred", "Invalid Token");
+    }
 
     // if (JSON.parse(req.body).id) {
     //   return failure(res, 400, "Error Occurred", "Shouldn't Containt ID");
