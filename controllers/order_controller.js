@@ -179,6 +179,7 @@ class OrderController {
       order = {
         ...order,
         user: user_id,
+        order_list: order.order_list,
         deliveryFee: delivery_options.deliveryOptions.deliveryFee,
         time: getCurrentDateTime(),
         order_status: "On Process",
@@ -205,6 +206,10 @@ class OrderController {
         "Internal Server Issue"
       );
     }
+  }
+
+  async getOrderByUserId(req, res){
+
   }
 
   async getOrderByRestaurantId(req, res) {

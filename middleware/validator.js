@@ -111,7 +111,7 @@ const validateNewOrderData = async (req, res, next) => {
           return false;
         }
 
-        if (!orderItem.quantity || orderItem.quantity == 0) {
+        if (!orderItem.quantity || orderItem.quantity <= 0) {
           errors.menu_quantity = "Quantity should be at least 1";
           return false;
         }
@@ -125,7 +125,7 @@ const validateNewOrderData = async (req, res, next) => {
       });
 
       if (totalOrderItems > 20) {
-        errors.quantity = "Quantity should be less than 20";
+        errors.quantity = "Total Quantity should be less than 20";
       }
 
       if (invalidMenuIds.length != 0) {

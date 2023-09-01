@@ -24,6 +24,7 @@ const orderSchema = new mongoose.Schema({
   },
   order_list: [
     {
+      menu_id: Number,
       dish_name: {
         type: String,
       },
