@@ -39,7 +39,12 @@ const restaurantSchema = new mongoose.Schema({
     type: String,
     required: [true, "Owner is not provided"],
   },
-});
+  menu: [mongoose.Schema.Types.Mixed],
+  rating: Number,
+  review: String,
+  website: String,
+},
+{timestamps: true},);
 
 const RestaurantModel = mongoose.model("restaurants", restaurantSchema);
 

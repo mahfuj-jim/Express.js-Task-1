@@ -12,7 +12,27 @@ class RestaurantController {
       const page = parseInt(req.query.page) || 1;
       const pageSize = parseInt(req.query.pageSize) || 10;
 
-      RestaurantModel.find({})
+      const filters = {};
+
+      if (req.query.minRating) {
+        filters["rating"] = { $gte: parseFloat(req.query.minRating) };
+      }
+      if (req.query.deliveryAreaContains) {
+        filters["deliveryOptions.deliveryArea"] = {
+          $regex: new RegExp(req.query.deliveryAreaContains, "i"),
+        };
+      }
+      if (req.query.maxMenuPrice) {
+        filters["menu.price"] = { $lte: parseInt(req.query.maxMenuPrice) };
+      }
+      if (req.query.maxDeliveryFee) {
+        filters["deliveryOptions.deliveryFee"] = {
+          $lte: parseInt(req.query.maxDeliveryFee),
+        };
+      }
+
+      RestaurantModel.find(filters)
+        .select("-password -id")
         .then((restaurantData) => {
           const startIndex = (page - 1) * pageSize;
           const endIndex = startIndex + pageSize;
@@ -21,9 +41,13 @@ class RestaurantController {
             endIndex
           );
 
-          success(res, "Successfully Received.", paginatedRestaurants);
+          success(res, "Successfully Received.", {
+            total_restaurant: paginatedRestaurants.length,
+            restaurants: paginatedRestaurants,
+          });
         })
         .catch((error) => {
+          console.log(error);
           failure(res, 500, "Failed to get data", "Internal Server Issue");
         });
     } catch (err) {
@@ -201,46 +225,51 @@ class RestaurantController {
     try {
       const { email, password } = JSON.parse(req.body);
 
-      RestaurantModel.findOne({ email }).then( async (restaurant) => {
-        const isPasswordValid = await bcrypt.compare(password, restaurant.password);
+      RestaurantModel.findOne({ email })
+        .then(async (restaurant) => {
+          const isPasswordValid = await bcrypt.compare(
+            password,
+            restaurant.password
+          );
 
-      if (!isPasswordValid) {
-        return failure(res, 401, "Login failed", "Invalid password");
-      }
+          if (!isPasswordValid) {
+            return failure(res, 401, "Login failed", "Invalid password");
+          }
 
-      const token = jwt.sign(
-        {
-          restaurant: {
-            id: restaurant._id,
-            name: restaurant.name,
-            location: restaurant.location,
-            cuisine: restaurant.cuisine,
-            rating: restaurant.rating,
-            contactNumber: restaurant.contactNumber,
-            owner: restaurant.owner,
-            email: restaurant.email,
-          },
-          role: "restaurant",
-        },
-        process.env.ACCESS_TOKEN_SECRET
-      );
+          const token = jwt.sign(
+            {
+              restaurant: {
+                id: restaurant._id,
+                name: restaurant.name,
+                location: restaurant.location,
+                cuisine: restaurant.cuisine,
+                rating: restaurant.rating,
+                contactNumber: restaurant.contactNumber,
+                owner: restaurant.owner,
+                email: restaurant.email,
+              },
+              role: "restaurant",
+            },
+            process.env.ACCESS_TOKEN_SECRET
+          );
 
-      return success(res, "Authentication successful", {
-        token,
-        restaurant: {
-          id: restaurant._id,
-          name: restaurant.name,
-          location: restaurant.location,
-          cuisine: restaurant.cuisine,
-          rating: restaurant.rating,
-          contactNumber: restaurant.contactNumber,
-          owner: restaurant.owner,
-          email: restaurant.email,
-        },
-      });
-      }).catch(error => {
-        return failure(res, 401, "Login failed", "Restaurant not found");
-      });
+          return success(res, "Authentication successful", {
+            token,
+            restaurant: {
+              id: restaurant._id,
+              name: restaurant.name,
+              location: restaurant.location,
+              cuisine: restaurant.cuisine,
+              rating: restaurant.rating,
+              contactNumber: restaurant.contactNumber,
+              owner: restaurant.owner,
+              email: restaurant.email,
+            },
+          });
+        })
+        .catch((error) => {
+          return failure(res, 401, "Login failed", "Restaurant not found");
+        });
     } catch (err) {
       console.log(err);
       failure(res, 500, "Login failed", "Internal Server Issue");

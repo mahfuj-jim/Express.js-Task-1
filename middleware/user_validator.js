@@ -7,7 +7,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 async function authenticateUser(req, res, next) {
-  console.log("Next");
   const authHeader = req.header("Authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
