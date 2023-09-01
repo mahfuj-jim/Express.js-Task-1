@@ -1,27 +1,152 @@
-// const { success, failure } = require("../util/common.js");
-// const Order = require("../models/order.js");
-// const jwt = require("jsonwebtoken");
-// const dotenv = require("dotenv");
-
-// dotenv.config();
-
 const { success, failure } = require("../util/common.js");
+const mongoose = require("mongoose");
 const OrderModel = require("../models/order_models.js");
 
-class OrderController{
-    async getAllOrderData(req, res) {
-        try {
-          const orders = await OrderModel.find({});
-      
-          if (orders.length > 0) {
-            success(res, "Successfully Received.", orders);
-          } else {
-            failure(res, 404, "No order data found.", "No orders available.");
-          }
-        } catch (error) {
-          failure(res, 500, "Failed to get data", "Internal Server Issue");
-        }
+class OrderController {
+  async getAllOrderData(req, res) {
+    try {
+      const orders = await OrderModel.aggregate([
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $lookup: {
+            from: "restaurants",
+            localField: "restaurant",
+            foreignField: "_id",
+            as: "restaurant",
+          },
+        },
+        {
+          $addFields: {
+            total_price: {
+              $add: [
+                "$delivery_fee",
+                {
+                  $sum: {
+                    $map: {
+                      input: "$order_list",
+                      as: "item",
+                      in: { $multiply: ["$$item.price", "$$item.quantity"] },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            time: 1,
+            order_status: 1,
+            delivery_fee: 1,
+            order_list: 1,
+            location: 1,
+            delivered_time: 1,
+            user: {
+              name: 1,
+              phoneNumber: 1,
+            },
+            restaurant: {
+              name: 1,
+              contactNumber: 1,
+              location: 1,
+            },
+            total_price: 1,
+          },
+        },
+      ]);
+
+      if (orders.length > 0) {
+        success(res, "Successfully Received.", orders);
+      } else {
+        failure(res, 404, "No order data found.", "No orders available.");
       }
+    } catch (error) {
+      console.log(error);
+      failure(res, 500, "Failed to get data", "Internal Server Issue");
+    }
+  }
+
+  async getOrderById(req, res) {
+    const orderId = req.params.orderId;
+
+    try {
+      const orders = await OrderModel.aggregate([
+        { $match: { _id: new mongoose.Types.ObjectId(orderId) } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $lookup: {
+            from: "restaurants",
+            localField: "restaurant",
+            foreignField: "_id",
+            as: "restaurant",
+          },
+        },
+        {
+          $addFields: {
+            total_price: {
+              $add: [
+                "$delivery_fee",
+                {
+                  $sum: {
+                    $map: {
+                      input: "$order_list",
+                      as: "item",
+                      in: { $multiply: ["$$item.price", "$$item.quantity"] },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            time: 1,
+            order_status: 1,
+            delivery_fee: 1,
+            order_list: 1,
+            location: 1,
+            delivered_time: 1,
+            user: {
+              name: 1,
+              phoneNumber: 1,
+            },
+            restaurant: {
+              name: 1,
+              contactNumber: 1,
+              location: 1,
+            },
+            total_price: 1,
+          },
+        },
+      ]);
+
+      if (orders.length > 0) {
+        success(res, "Successfully Received.", orders);
+      } else {
+        failure(res, 404, "No order data found.", "No orders available.");
+      }
+    } catch (error) {
+      console.log(error);
+      failure(res, 500, "Failed to get data", "Internal Server Issue");
+    }
+  }
 }
 
 // class OrderController {

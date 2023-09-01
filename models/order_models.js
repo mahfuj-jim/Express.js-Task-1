@@ -13,12 +13,12 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  user_id: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "users",
     required: true,
   },
-  restaurant_id: {
+  restaurant: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "restaurants",
     required: true,

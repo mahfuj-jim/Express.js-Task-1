@@ -6,6 +6,7 @@ const express = require("express");
 const routes = express.Router();
 
 routes.get("/all", OrderController.getAllOrderData);
+routes.get("/all/:orderId", OrderController.getOrderById);
 // routes.get("/", OrderController.getOrderById);
 // routes.get("/restaurant", authenticateRestaurant, OrderController.getOrderByRestaurantId);
 // routes.get("/user",  authenticateUser, OrderController.getOrderByUserID);
