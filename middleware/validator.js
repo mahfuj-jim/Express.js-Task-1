@@ -86,7 +86,7 @@ const validateNewOrderData = async (req, res, next) => {
   if (!restaurant) {
     errors.restaurant = "Restaurant ID is not provided";
   } else {
-    await RestaurantModel.findOne({ _id: restaurant }, { password: false })
+    await RestaurantModel.findOne({ _id: restaurant })
       .then((restaurantDetails) => {
         restaurantData = restaurantDetails;
       })

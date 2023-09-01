@@ -1,4 +1,5 @@
 const { failure } = require("../util/common.js");
+const RestaurantModel = require("../models/restaurant_model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -22,6 +23,14 @@ async function authenticateRestaurant(req, res, next) {
     if (role != "restaurant") {
       return failure(res, 403, "Error Occurred", "Invalid Token");
     }
+
+    await RestaurantModel.findOne({ _id: restaurant._id })
+      .then((restaurantDetails) => {
+        
+      })
+      .catch((error) => {
+        return failure(res, 403, "Error Occurred", "Invalid Restaurant");
+      });
 
     // if (JSON.parse(req.body).id) {
     //   return failure(res, 400, "Error Occurred", "Shouldn't Containt ID");

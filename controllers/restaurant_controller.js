@@ -239,7 +239,7 @@ class RestaurantController {
           const token = jwt.sign(
             {
               restaurant: {
-                id: restaurant._id,
+                _id: restaurant._id,
                 name: restaurant.name,
                 location: restaurant.location,
                 cuisine: restaurant.cuisine,

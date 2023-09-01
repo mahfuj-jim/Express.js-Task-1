@@ -8,7 +8,16 @@ const OrderModel = require("../models/order_models.js");
 class OrderController {
   async getAllOrderData(req, res) {
     try {
+      const status = req.query.onProccessOrder;
+
+      const filter = {};
+
+      if (status == true) {
+        filter.order_status = "On Process";
+      }
+
       const orders = await OrderModel.aggregate([
+        { $match: filter },
         {
           $lookup: {
             from: "users",
@@ -66,10 +75,10 @@ class OrderController {
         },
       ]);
 
-      if (orders.length > 0) {
+      if (orders) {
         success(res, "Successfully Received.", orders);
       } else {
-        failure(res, 404, "No order data found.", "No orders available.");
+        failure(res, 500, "Failed to get data.", "Internal Server Issue");
       }
     } catch (error) {
       console.log(error);
@@ -188,13 +197,52 @@ class OrderController {
           );
         });
     } catch (err) {
-      console.log(err);
       return failure(
         res,
         500,
         "Failed to create new order",
         "Internal Server Issue"
       );
+    }
+  }
+
+  async getOrderByRestaurantId(req, res) {
+    try {
+      const authHeader = req.header("Authorization");
+      const token = authHeader.substring(7);
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      const restaurantId = decodedToken.restaurant._id;
+
+      const status = req.query.onProccessOrder;
+
+      const filter = {
+        restaurant: restaurantId,
+      };
+
+      if (status == true) {
+        filter.order_status = "On Process";
+      }
+
+      await OrderModel.find(filter)
+        .populate("user", "name phoneNumber")
+        .populate("restaurant", "name contactNumber location")
+        .then((orders) => {
+          return success(res, "Successfully Received.", {
+            total_orders: orders.length,
+            orders: orders,
+          });
+        })
+        .catch((err) => {
+          return failure(
+            res,
+            500,
+            "Failed to get data",
+            "Internal Server Error"
+          );
+          v;
+        });
+    } catch (error) {
+      return failure(res, 500, "Failed to get data", "Internal Server Error");
     }
   }
 }
