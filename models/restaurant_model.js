@@ -11,10 +11,6 @@ const restaurantSchema = new mongoose.Schema({
     required: [true, "Email is not provided"],
     unique: true,
   },
-  password: {
-    type: String,
-    required: [true, "Password is not provided"],
-  },
   contactNumber: {
     type: String,
     required: [true, "Contact Number is not provided"],
