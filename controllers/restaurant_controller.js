@@ -1,5 +1,5 @@
 const { success, failure } = require("../util/common.js");
-const Restaurant = require("../models/restaurant.js");
+const RestaurantModel = require("../models/restaurant_model.js");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv");
@@ -12,18 +12,44 @@ class RestaurantController {
       const page = parseInt(req.query.page) || 1;
       const pageSize = parseInt(req.query.pageSize) || 10;
 
-      const result = await Restaurant.getAllRestaurantData(true);
-      if (result.success) {
-        const restaurantData = result.data;
+      const filters = {};
 
-        const startIndex = (page - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-        const paginatedRestaurants = restaurantData.slice(startIndex, endIndex);
-
-        success(res, "Successfully Received.", paginatedRestaurants);
-      } else {
-        failure(res, 500, "Failed to get data", result.error);
+      if (req.query.minRating) {
+        filters["rating"] = { $gte: parseFloat(req.query.minRating) };
       }
+      if (req.query.deliveryAreaContains) {
+        filters["deliveryOptions.deliveryArea"] = {
+          $regex: new RegExp(req.query.deliveryAreaContains, "i"),
+        };
+      }
+      if (req.query.maxMenuPrice) {
+        filters["menu.price"] = { $lte: parseInt(req.query.maxMenuPrice) };
+      }
+      if (req.query.maxDeliveryFee) {
+        filters["deliveryOptions.deliveryFee"] = {
+          $lte: parseInt(req.query.maxDeliveryFee),
+        };
+      }
+
+      RestaurantModel.find(filters)
+        .select("-password -id")
+        .then((restaurantData) => {
+          const startIndex = (page - 1) * pageSize;
+          const endIndex = startIndex + pageSize;
+          const paginatedRestaurants = restaurantData.slice(
+            startIndex,
+            endIndex
+          );
+
+          success(res, "Successfully Received.", {
+            total_restaurant: paginatedRestaurants.length,
+            restaurants: paginatedRestaurants,
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+          failure(res, 500, "Failed to get data", "Internal Server Issue");
+        });
     } catch (err) {
       failure(res, 500, "Failed to get data", "Internal Server Issue");
     }
@@ -32,37 +58,44 @@ class RestaurantController {
   async getRestaurantById(req, res) {
     try {
       const { restaurantId } = req.params;
-      console.log(restaurantId);
-      const result = await Restaurant.getRestaurantById(restaurantId);
-
-      if (result.success) {
-        success(res, "Successfully Received.", result.data);
-      } else {
-        failure(res, result.code, "Failed to get data", result.error);
-      }
+      RestaurantModel.findOne({ _id: restaurantId }, { password: false })
+        .then((restaurant) => {
+          return success(res, "Successfully Received.", restaurant);
+        })
+        .catch((error) => {
+          return failure(
+            res,
+            400,
+            "Failed to get data",
+            "Restaurant not found"
+          );
+        });
     } catch (err) {
-      failure(res, 500, "Failed to get data", "Internal Server Issue");
+      return failure(res, 500, "Failed to get data", "Internal Server Issue");
     }
   }
 
   async createRestaurant(req, res) {
     try {
       let restaurant = JSON.parse(req.body);
+
       const hashedPassword = await bcrypt.hash(restaurant.password, 10);
       restaurant = { ...restaurant, password: hashedPassword };
 
-      const result = await Restaurant.createRestaurant(restaurant);
-
-      if (result.success) {
-        success(res, "Successfully Created.", result.data);
-      } else {
-        failure(
-          res,
-          result.code,
-          "Failed to create new restaurant",
-          result.error
-        );
-      }
+      RestaurantModel.create(restaurant)
+        .then((createdRestaurant) => {
+          createdRestaurant.password = undefined;
+          return success(res, "Successfully Created.", createdRestaurant);
+        })
+        .catch((error) => {
+          console.log(error);
+          return failure(
+            res,
+            500,
+            "Failed to create new restaurant",
+            "Internal Server Issue"
+          );
+        });
     } catch (err) {
       console.log(err);
       failure(
@@ -78,16 +111,34 @@ class RestaurantController {
     try {
       const { restaurantId } = req.params;
 
-      const result = await Restaurant.updateRestaurant(
-        restaurantId,
-        JSON.parse(req.body)
-      );
-
-      if (result.success) {
-        success(res, "Successfully Updated.", result.data);
-      } else {
-        failure(res, result.code, "Failed to update data", result.error);
-      }
+      RestaurantModel.findOne({ _id: restaurantId })
+        .then((restaurant) => {
+          RestaurantModel.updateOne({ _id: restaurantId }, JSON.parse(req.body))
+            .then((updatedRestaurant) => {
+              return success(
+                res,
+                "Successfully Updated.",
+                JSON.parse(req.body)
+              );
+            })
+            .catch((error) => {
+              return failure(
+                res,
+                500,
+                "Failed to Update",
+                "Internal Server Issue"
+              );
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+          return failure(
+            res,
+            400,
+            "Failed to get data",
+            "Restaurant not found"
+          );
+        });
     } catch (err) {
       failure(res, 500, "Failed to update data", "Internal Server Issue");
     }
@@ -97,93 +148,128 @@ class RestaurantController {
     try {
       const { restaurantId } = req.params;
 
-      const result = await Restaurant.deleteRestaurantById(restaurantId);
-      if (result.success) {
-        success(res, "Successfully Deleted.", result.data);
-      } else {
-        failure(res, result.code, "Failed to delete data", result.error);
-      }
+      RestaurantModel.findOne({ _id: restaurantId })
+        .then((restaurant) => {
+          RestaurantModel.deleteOne({ _id: restaurantId })
+            .then((deleteed) => {
+              return success(
+                res,
+                "Successfully Executed",
+                `Delete Restaurant with ID ${restaurantId}`
+              );
+            })
+            .catch((error) => {
+              return failure(
+                res,
+                500,
+                "Failed to Update",
+                "Internal Server Issue"
+              );
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+          return failure(
+            res,
+            400,
+            "Failed to get data",
+            "Restaurant not found"
+          );
+        });
     } catch (err) {
       failure(res, 500, "Failed to delete data", "Internal Server Issue");
     }
   }
 
-  async getRestaurantReview(req, res) {
-    try {
-      const { restaurantId } = req.query;
-      const result = await Restaurant.getRestaurantReview(restaurantId);
+  // async getRestaurantReview(req, res) {
+  //   try {
+  //     const { restaurantId } = req.query;
+  //     const result = await Restaurant.getRestaurantReview(restaurantId);
 
-      if (result.success) {
-        success(res, "Successfully Received Reviews.", result.data);
-      } else {
-        failure(res, result.code, "Failed to get reviews", result.error);
-      }
-    } catch (err) {
-      failure(res, 500, "Failed to get reviews", "Internal Server Error");
-    }
-  }
+  //     if (result.success) {
+  //       success(res, "Successfully Received Reviews.", result.data);
+  //     } else {
+  //       failure(res, result.code, "Failed to get reviews", result.error);
+  //     }
+  //   } catch (err) {
+  //     failure(res, 500, "Failed to get reviews", "Internal Server Error");
+  //   }
+  // }
 
-  async createRestaurantReview(req, res) {
-    try {
-      const authHeader = req.header("Authorization");
-      const token = authHeader.substring(7);
-      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-      const user_id = decodedToken.user.user_id;
+  // async createRestaurantReview(req, res) {
+  //   try {
+  //     const authHeader = req.header("Authorization");
+  //     const token = authHeader.substring(7);
+  //     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+  //     const user_id = decodedToken.user.user_id;
 
-      const { restaurantId } = req.query;
-      const result = await Restaurant.createRestaurantReview(
-        restaurantId,
-        user_id,
-        JSON.parse(req.body)
-      );
+  //     const { restaurantId } = req.query;
+  //     const result = await Restaurant.createRestaurantReview(
+  //       restaurantId,
+  //       user_id,
+  //       JSON.parse(req.body)
+  //     );
 
-      if (result.success) {
-        success(res, "Successfully Received Reviews.", result.data);
-      } else {
-        failure(res, result.code, "Failed to add review", result.error);
-      }
-    } catch (err) {
-      console.log(err);
-      failure(res, 500, "Failed to add review", "Internal Server Error");
-    }
-  }
+  //     if (result.success) {
+  //       success(res, "Successfully Received Reviews.", result.data);
+  //     } else {
+  //       failure(res, result.code, "Failed to add review", result.error);
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //     failure(res, 500, "Failed to add review", "Internal Server Error");
+  //   }
+  // }
 
   async login(req, res) {
     try {
-      const { email } = JSON.parse(req.body);
+      const { email, password } = JSON.parse(req.body);
 
-      const restaurant = await Restaurant.findByEmail(email);
+      RestaurantModel.findOne({ email })
+        .then(async (restaurant) => {
+          const isPasswordValid = await bcrypt.compare(
+            password,
+            restaurant.password
+          );
 
-      const token = jwt.sign(
-        {
-          restaurant: {
-            id: restaurant.id,
-            name: restaurant.name,
-            location: restaurant.location,
-            cuisine: restaurant.cuisine,
-            rating: restaurant.rating,
-            contactNumber: restaurant.contactNumber,
-            owner: restaurant.owner,
-            email: restaurant.email,
-          },
-          role: "restaurant",
-        },
-        process.env.ACCESS_TOKEN_SECRET
-      );
+          if (!isPasswordValid) {
+            return failure(res, 401, "Login failed", "Invalid password");
+          }
 
-      return success(res, "Authentication successful", {
-        token,
-        restaurant: {
-          id: restaurant.id,
-          name: restaurant.name,
-          location: restaurant.location,
-          cuisine: restaurant.cuisine,
-          rating: restaurant.rating,
-          contactNumber: restaurant.contactNumber,
-          owner: restaurant.owner,
-          email: restaurant.email,
-        },
-      });
+          const token = jwt.sign(
+            {
+              restaurant: {
+                _id: restaurant._id,
+                name: restaurant.name,
+                location: restaurant.location,
+                cuisine: restaurant.cuisine,
+                rating: restaurant.rating,
+                contactNumber: restaurant.contactNumber,
+                owner: restaurant.owner,
+                email: restaurant.email,
+              },
+              role: "restaurant",
+            },
+            process.env.ACCESS_TOKEN_SECRET
+          );
+
+          return success(res, "Authentication successful", {
+            token,
+            restaurant: {
+              id: restaurant._id,
+              name: restaurant.name,
+              location: restaurant.location,
+              cuisine: restaurant.cuisine,
+              rating: restaurant.rating,
+              contactNumber: restaurant.contactNumber,
+              owner: restaurant.owner,
+              email: restaurant.email,
+            },
+          });
+        })
+        .catch((error) => {
+          return failure(res, 401, "Login failed", "Restaurant not found");
+        });
     } catch (err) {
       console.log(err);
       failure(res, 500, "Login failed", "Internal Server Issue");

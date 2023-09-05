@@ -1,5 +1,5 @@
 const { failure } = require("../util/common.js");
-const User = require("../models/user.js");
+const UserModel = require("../models/user_model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -24,15 +24,15 @@ async function authenticateUser(req, res, next) {
       return failure(res, 403, "Failed to Execute", "Invalid Token");
     }
 
-    const responseUserData = await User.getAllUserData();
-    const userData = responseUserData.data;
-    const userIndex = userData.findIndex(
-      (item) => item.user_id == user.user_id
-    );
-
-    if (userIndex == -1) {
-      return failure(res, 403, "Failed to Execute", "Invalid User");
-    }
+    UserModel.findOne({ _id: user._id }, { password: false })
+      .then((user) => {
+        if (!user) {
+          return failure(res, 403, "Failed to Execute", "Invalid User");
+        }
+      })
+      .catch((error) => {
+        return failure(res, 500, "Failed to Execute", "Internal Server Issue");
+      });
 
     next();
   } catch (err) {
@@ -53,19 +53,19 @@ async function userLoginValidation(req, res, next) {
     errors.password = "Password was not provided";
   }
 
-  const user = await User.findByEmail(email);
-  if (!user) {
-    errors.email = "Email Doesn't Exist";
-  }
+  // const user = await User.findByEmail(email);
+  // if (!user) {
+  //   errors.email = "Email Doesn't Exist";
+  // }
 
-  if (Object.keys(errors).length > 0) {
-    return failure(res, 422, "Invalid Input", errors);
-  }
+  // if (Object.keys(errors).length > 0) {
+  //   return failure(res, 422, "Invalid Input", errors);
+  // }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    return failure(res, 401, "Authentication failed", "Wrong Password");
-  }
+  // const isPasswordValid = await bcrypt.compare(password, user.password);
+  // if (!isPasswordValid) {
+  //   return failure(res, 401, "Authentication failed", "Wrong Password");
+  // }
 
   next();
 }
@@ -78,9 +78,10 @@ async function userSignupValidation(req, res, next) {
   if (!email || email === "") {
     errors.email = "Email was not provided";
   } else {
-    const user = await User.findByEmail(email);
-    if (user) {
-      errors.email = "Email Already Exists";
+    const newUser = JSON.parse(req.body);
+    const existingUser = await UserModel.findOne({ email: newUser.email });
+    if (existingUser) {
+      errors.email = "Email Already Exist";
     }
   }
 

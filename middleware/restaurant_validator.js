@@ -1,5 +1,5 @@
 const { failure } = require("../util/common.js");
-const Restaurant = require("../models/restaurant.js");
+const RestaurantModel = require("../models/restaurant_model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -24,28 +24,36 @@ async function authenticateRestaurant(req, res, next) {
       return failure(res, 403, "Error Occurred", "Invalid Token");
     }
 
-    if (JSON.parse(req.body).id) {
-      return failure(res, 400, "Error Occurred", "Shouldn't Containt ID");
-    }
+    await RestaurantModel.findOne({ _id: restaurant._id })
+      .then((restaurantDetails) => {
+        
+      })
+      .catch((error) => {
+        return failure(res, 403, "Error Occurred", "Invalid Restaurant");
+      });
 
-    const responseUserData = await Restaurant.getAllRestaurantData();
-    const restaurantData = responseUserData.data;
-    const restaurantIndex = restaurantData.findIndex(
-      (item) => item.id == restaurant.id
-    );
+    // if (JSON.parse(req.body).id) {
+    //   return failure(res, 400, "Error Occurred", "Shouldn't Containt ID");
+    // }
 
-    if (restaurantIndex == -1) {
-      return failure(res, 403, "Error Occurred", "Invalid Restaurant");
-    }
+    // const responseUserData = await Restaurant.getAllRestaurantData();
+    // const restaurantData = responseUserData.data;
+    // const restaurantIndex = restaurantData.findIndex(
+    //   (item) => item.id == restaurant.id
+    // );
 
-    const { restaurantId } = req.params;
-    if (
-      Object.keys(req.params).length !== 0 &&
-      (restaurantId == "" || restaurantId != restaurant.id)
-    ) {
-      console.log(restaurantId);
-      return failure(res, 403, "Error Occurred", "Invalid Restaurant");
-    }
+    // if (restaurantIndex == -1) {
+    //   return failure(res, 403, "Error Occurred", "Invalid Restaurant");
+    // }
+
+    // const { restaurantId } = req.params;
+    // if (
+    //   Object.keys(req.params).length !== 0 &&
+    //   (restaurantId == "" || restaurantId != restaurant.id)
+    // ) {
+    //   console.log(restaurantId);
+    //   return failure(res, 403, "Error Occurred", "Invalid Restaurant");
+    // }
 
     next();
   } catch (err) {
@@ -63,20 +71,20 @@ async function validateRestaurantReview(req, res, next) {
   const token = authHeader.substring(7);
 
   try {
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    const role = decodedToken.role;
+    // const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    // const role = decodedToken.role;
 
-    if (role != "restaurant" && role != "user") {
-      return failure(res, 403, "Error Occurred", "Invalid Token");
-    }
+    // if (role != "restaurant" && role != "user") {
+    //   return failure(res, 403, "Error Occurred", "Invalid Token");
+    // }
 
-    if (role == "restaurant") {
-      const restaurant = decodedToken.restaurant;
+    // if (role == "restaurant") {
+    //   const restaurant = decodedToken.restaurant;
 
-      if (restaurant.id != req.query.restaurantId) {
-        return failure(res, 403, "Error Occurred", "Invalid Token");
-      }
-    }
+    //   if (restaurant.id != req.query.restaurantId) {
+    //     return failure(res, 403, "Error Occurred", "Invalid Token");
+    //   }
+    // }
 
     next();
   } catch (err) {

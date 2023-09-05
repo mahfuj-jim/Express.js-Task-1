@@ -1,37 +1,5 @@
 const { failure } = require("../util/common.js");
-const Restaurant = require("../models/restaurant.js");
-const User = require("../models/user.js");
-// const { body } = require("express-validator");
-
-// const validator = {
-//   create: [
-//     body("name")
-//       .exists()
-//       .withMessage("Name was not provided")
-//       .isString()
-//       .withMessage("Name must be a string"),
-//     body("openHours").exists().withMessage("Open Hours was not provided"),
-//     body("deliveryOptions")
-//       .exists()
-//       .withMessage("Delivery Options was not provided")
-//       .not()
-//       .custom((value) => {
-//         const { deliveryArea, deliveryFee } = value;
-
-//         if (!deliveryArea || deliveryArea === "" || deliveryArea.length == 0) {
-//           throw new Error("Delivery Area was not provided");
-//         }
-
-//         if (!deliveryFee || deliveryFee === "") {
-//           errors.deliveryFee = "Delivery Fee is not provided";
-//         } else if (deliveryFee > 100) {
-//           errors.deliveryFee = "Delivery Fee should not more than 100";
-//         }
-
-//         return true;
-//       }),
-//   ],
-// };
+const RestaurantModel = require("../models/restaurant_model.js");
 
 const validateRestaurantData = (req, res, next) => {
   let newRestaurant = JSON.parse(req.body);
@@ -97,7 +65,7 @@ const validateRestaurantData = (req, res, next) => {
 
   if (!password || password === "") {
     errors.password = "Password was not provided";
-  }else if(password.length < 8){
+  } else if (password.length < 8) {
     errors.password = "Password must be 8 or more characters";
   }
 
@@ -109,37 +77,74 @@ const validateRestaurantData = (req, res, next) => {
 };
 
 const validateNewOrderData = async (req, res, next) => {
-  const restaurantData = await Restaurant.getAllRestaurantData();
-
   let newOrder = JSON.parse(req.body);
-  const { restaurant_id, order_list, location } = newOrder;
-  const errors = {};
+  const { restaurant, order_list, location } = newOrder;
 
-  if (!restaurant_id) {
-    errors.restaurant_id = "Restaurant ID is not provided";
+  const errors = {};
+  let restaurantData;
+
+  if (!restaurant) {
+    errors.restaurant = "Restaurant ID is not provided";
   } else {
-    const restaurantIndex = restaurantData.data.findIndex(
-      (restaurant) => newOrder.restaurant_id === restaurant.id
-    );
-    if (restaurantIndex == -1) {
-      errors.restaurant_id = "Restaurant ID not found";
-    } else {
-      if (
-        !restaurantData.data[restaurantIndex].deliveryOptions.deliveryArea
-          .toLowerCase()
-          .includes(location.toLowerCase())
-      ) {
-        errors.location = "Delivery is not available in your location";
-      }
-    }
+    await RestaurantModel.findOne({ _id: restaurant })
+      .then((restaurantDetails) => {
+        restaurantData = restaurantDetails;
+      })
+      .catch((error) => {
+        errors.restaurant = "Invalid Restaurant ID";
+      });
   }
 
   if (!order_list || order_list.length === 0) {
     errors.order_list = "Order List is not provided";
+  } else {
+    try {
+      const menuIdSet = new Set(
+        restaurantData.menu.map((menuItem) => menuItem.id)
+      );
+      const invalidMenuIds = [];
+      let totalOrderItems = 0;
+
+      newOrder.order_list.filter((orderItem) => {
+        if (!orderItem.menu_id) {
+          errors.menu_id = "Item is not selected properly";
+          return false;
+        }
+
+        if (!orderItem.quantity || orderItem.quantity <= 0) {
+          errors.menu_quantity = "Quantity should be at least 1";
+          return false;
+        }
+
+        if (!menuIdSet.has(orderItem.menu_id)) {
+          invalidMenuIds.push(orderItem.menu_id);
+        }
+
+        totalOrderItems += orderItem.quantity;
+        return true;
+      });
+
+      if (totalOrderItems > 20) {
+        errors.quantity = "Total Quantity should be less than 20";
+      }
+
+      if (invalidMenuIds.length != 0) {
+        errors.menu = `${invalidMenuIds} menu item didn't exist`;
+      }
+    } catch (err) {}
   }
 
   if (!location || location === "") {
     errors.location = "Location is not provided";
+  } else {
+    try {
+      const isContained =
+        restaurantData.deliveryOptions.deliveryArea.includes(location);
+
+      if (!isContained) {
+        errors.location = "Delivery is not available in your area";
+      }
+    } catch (err) {}
   }
 
   if (Object.keys(errors).length > 0) {
