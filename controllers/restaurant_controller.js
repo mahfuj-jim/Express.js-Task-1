@@ -14,6 +14,7 @@ class RestaurantController {
       const filter = req.query.filter;
       const sortOption = req.query.sortOption;
       const sort = req.query.sort || "asc";
+      const search = req.query.search;
       let query = {};
       let sortObj = {};
 
@@ -95,6 +96,16 @@ class RestaurantController {
           HTTP_RESPONSE.BAD_REQUEST,
           RESPONSE_MESSAGE.INVALID_SORTING_OPTION
         );
+      }
+
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: "i" } },
+          { location: { $regex: search, $options: "i" } },
+          { "deliveryOptions.deliveryArea": { $regex: search, $options: "i" } },
+          { cuisine: { $regex: search, $options: "i" } },
+          { "menu.dishName": { $regex: search, $options: "i" } },
+        ];
       }
 
       const restaurants = await RestaurantModel.find(query)
@@ -211,12 +222,10 @@ class RestaurantController {
       RestaurantModel.findOne({ _id: restaurantId })
         .then((restaurant) => {
           writeToLogFile(`Get menu for Restaurant with ID ${restaurantId}`);
-          return success(
-            res,
-            HTTP_STATUS.OK,
-            HTTP_RESPONSE.OK,
-            restaurant.menu
-          );
+          return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, {
+            totlaItem: restaurant.menu.length,
+            menu: restaurant.menu,
+          });
         })
         .catch((err) => {
           writeToLogFile(
