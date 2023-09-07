@@ -13,7 +13,9 @@ const RESPONSE_MESSAGE = {
     USER_NOT_FOUND: "User not found",
     RESTAURANT_NOT_FOUND: "Restaurant not found",
     CART_ALREADY_EXISTS: "Cart already exits",
-    INVALID_CART: "Cart is not valid to create order"
+    INVALID_CART: "Cart is not valid to create order",
+    INVALID_DATA: "Please provide valid data",
+    INVALID_FILTER_OPTION: "Filter option is not valid"
 };
 
 module.exports = RESPONSE_MESSAGE;
