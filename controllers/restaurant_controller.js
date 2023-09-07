@@ -12,7 +12,10 @@ class RestaurantController {
       const limit = parseInt(req.query.limit) || 10;
       const filterOption = req.query.filterOption;
       const filter = req.query.filter;
+      const sortOption = req.query.sortOption;
+      const sort = req.query.sort || "asc";
       let query = {};
+      let sortObj = {};
 
       if (page < 1 || limit < 0) {
         return failure(
@@ -26,13 +29,23 @@ class RestaurantController {
       if (filterOption && filter) {
         switch (filterOption) {
           case "cuisine":
-            query.cuisine = { $regex: filter, $options: "i" };
+            const cuisines = filter.split(",");
+            const cuisineRegex = cuisines.map(
+              (cuisine) => new RegExp(cuisine, "i")
+            );
+            query.cuisine = { $in: cuisineRegex };
             break;
           case "location":
-            query.location = { $regex: filter, $options: "i" };
+            const locations = filter.split(",");
+            const locationRegex = locations.map(
+              (location) => new RegExp(location, "i")
+            );
+            query.location = { $in: locationRegex };
             break;
           case "menu":
-            query["menu.dishName"] = { $regex: filter, $options: "i" };
+            const menus = filter.split(",");
+            const menuRegex = menus.map((menu) => new RegExp(menu, "i"));
+            query["menu.dishName"] = { $in: menuRegex };
             break;
           default:
             return failure(
@@ -52,7 +65,40 @@ class RestaurantController {
         );
       }
 
+      if (sortOption && sort) {
+        if (sort === "asc" || sort === "desc") {
+          switch (sortOption) {
+            case "deliveryFee":
+              sortObj["deliveryOptions.deliveryFee"] =
+                sort === "asc" ? 1 : sort === "desc" ? -1 : 1;
+              break;
+            default:
+              return failure(
+                res,
+                HTTP_STATUS.BAD_REQUEST,
+                HTTP_RESPONSE.BAD_REQUEST,
+                RESPONSE_MESSAGE.INVALID_SORTING_OPTION
+              );
+          }
+        } else {
+          return failure(
+            res,
+            HTTP_STATUS.BAD_REQUEST,
+            HTTP_RESPONSE.BAD_REQUEST,
+            RESPONSE_MESSAGE.INVALID_SORTING_OPTION
+          );
+        }
+      } else if ((sortOption && !sort) || (!sortOption && sort)) {
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          HTTP_RESPONSE.BAD_REQUEST,
+          RESPONSE_MESSAGE.INVALID_SORTING_OPTION
+        );
+      }
+
       const restaurants = await RestaurantModel.find(query)
+        .sort(sortObj)
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();
@@ -67,7 +113,7 @@ class RestaurantController {
         );
       }
 
-      writeToLogFile("Get All Restaurants");
+      writeToLogFile("Get ALl Restaurants");
       return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, {
         totalRestaurant: restaurants.length,
         page: page,

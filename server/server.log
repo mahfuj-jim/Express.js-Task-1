@@ -235,3 +235,66 @@
 07/09/2023 09:49:16 - Create a menu for Restaurant with ID 64f894b3b0bd71c9faf1d257
 07/09/2023 09:49:43 - Create a menu for Restaurant with ID 64f894b3b0bd71c9faf1d257
 07/09/2023 09:49:49 - Get All Restaurants
+07/09/2023 09:54:19 - Auth: Successfully Signup Role: 2 and ID: 64f9496b5e425c0f6cf0b7a1
+07/09/2023 09:57:22 - Auth: Successfully Signup Role: 2 and ID: 64f94a215e425c0f6cf0b7a6
+07/09/2023 09:57:27 - Get All Restaurants
+07/09/2023 09:59:14 - Auth: Successfully Signup Role: 2 and ID: 64f94a925e425c0f6cf0b7ac
+07/09/2023 09:59:29 - Get All Restaurants
+07/09/2023 10:00:29 - Auth: Successfully Signup Role: 2 and ID: 64f94adc5e425c0f6cf0b7b2
+07/09/2023 10:01:11 - Auth: Successfully Signup Role: 2 and ID: 64f94b075e425c0f6cf0b7b7
+07/09/2023 10:01:48 - Auth: Successfully Signup Role: 2 and ID: 64f94b2c5e425c0f6cf0b7bc
+07/09/2023 10:02:18 - Auth: Successfully Signup Role: 2 and ID: 64f94b4a5e425c0f6cf0b7c1
+07/09/2023 10:02:21 - Get All Restaurants
+07/09/2023 10:02:50 - Error: Failed to Signup Email: chillox.uttara@gmail.com already exists
+07/09/2023 10:03:02 - Auth: Successfully Signup Role: 2 and ID: 64f94b765e425c0f6cf0b7c8
+07/09/2023 10:03:09 - Get All Restaurants
+07/09/2023 10:06:56 - Get All Restaurants
+07/09/2023 10:08:09 - Get All Restaurants
+07/09/2023 10:09:09 - Get All Restaurants
+07/09/2023 10:09:14 - Get All Restaurants
+07/09/2023 10:09:46 - Error: Get All Restaurants ReferenceError: location is not defined
+07/09/2023 10:10:40 - Error: Get All Restaurants ReferenceError: location is not defined
+07/09/2023 10:13:46 - Get ALl Restaurants
+07/09/2023 10:14:09 - Get ALl Restaurants
+07/09/2023 10:15:35 - Get ALl Restaurants
+07/09/2023 10:18:24 - Get ALl Restaurants
+07/09/2023 10:19:19 - Get ALl Restaurants
+07/09/2023 10:19:36 - Get ALl Restaurants
+07/09/2023 10:19:43 - Get ALl Restaurants
+07/09/2023 10:29:45 - Get ALl Restaurants
+07/09/2023 10:38:23 - Get ALl Restaurants
+07/09/2023 10:38:34 - Get ALl Restaurants
+07/09/2023 10:44:21 - Get ALl Restaurants
+07/09/2023 10:45:06 - Get ALl Restaurants
+07/09/2023 10:45:09 - Get ALl Restaurants
+07/09/2023 10:45:18 - Get ALl Restaurants
+07/09/2023 10:45:45 - Get ALl Restaurants
+07/09/2023 10:47:04 - Get ALl Restaurants
+07/09/2023 10:50:47 - Get ALl Restaurants
+07/09/2023 10:53:09 - Get ALl Restaurants
+07/09/2023 10:53:52 - Get ALl Restaurants
+07/09/2023 10:55:07 - Get ALl Restaurants
+07/09/2023 10:55:24 - Get ALl Restaurants
+07/09/2023 10:55:34 - Get ALl Restaurants
+07/09/2023 10:59:01 - Get Restaurant with ID 64f7ec71503c5fde848aea4c
+07/09/2023 11:03:17 - Get ALl Restaurants
+07/09/2023 11:03:25 - Get ALl Restaurants
+07/09/2023 11:04:10 - Get ALl Restaurants
+07/09/2023 11:04:39 - Get ALl Restaurants
+07/09/2023 11:05:05 - Get ALl Restaurants
+07/09/2023 11:09:36 - Get ALl Restaurants
+07/09/2023 11:09:48 - Get ALl Restaurants
+07/09/2023 11:09:58 - Get ALl Restaurants
+07/09/2023 11:10:39 - Error: Get All Restaurants ReferenceError: asc is not defined
+07/09/2023 11:10:41 - Error: Get All Restaurants ReferenceError: asc is not defined
+07/09/2023 11:11:00 - Get ALl Restaurants
+07/09/2023 11:11:05 - Get ALl Restaurants
+07/09/2023 11:11:21 - Get ALl Restaurants
+07/09/2023 11:12:41 - Get ALl Restaurants
+07/09/2023 11:15:41 - Get ALl Restaurants
+07/09/2023 11:15:57 - Get ALl Restaurants
+07/09/2023 11:16:39 - Get ALl Restaurants
+07/09/2023 11:17:19 - Get ALl Restaurants
+07/09/2023 11:19:15 - Get ALl Restaurants
+07/09/2023 11:19:18 - Get ALl Restaurants
+07/09/2023 11:19:36 - Get ALl Restaurants
