@@ -67,7 +67,7 @@ class RestaurantController {
         );
       }
 
-      writeToLogFile("Get ALl Restaurants");
+      writeToLogFile("Get All Restaurants");
       return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, {
         totalRestaurant: restaurants.length,
         page: page,
