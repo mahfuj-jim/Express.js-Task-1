@@ -12,7 +12,8 @@ const RESPONSE_MESSAGE = {
     TOKEN_EXPIRE: "Login Again",
     USER_NOT_FOUND: "User not found",
     RESTAURANT_NOT_FOUND: "Restaurant not found",
-    CART_ALREADY_EXISTS: "Cart already exits"
+    CART_ALREADY_EXISTS: "Cart already exits",
+    INVALID_CART: "Cart is not valid to create order"
 };
 
 module.exports = RESPONSE_MESSAGE;

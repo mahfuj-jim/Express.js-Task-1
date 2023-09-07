@@ -114,7 +114,6 @@ class UserController {
       });
 
       cart.orderList = orderList;
-      console.log(orderList);
       user.cart = cart;
       await user.save();
 
