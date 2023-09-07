@@ -1,10 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const { databaseConnection } = require("./config/database.js");
-const restaurantRoutes = require("./routes/restaurant_route.js");
-const userRoutes = require("./routes/user_route.js");
-const orderRoutes = require("./routes/order_route.js");
-const authRoutes = require("./routes/auth_route.js");
+const restaurantRoutes = require("./routes/restaurant_routes.js");
+const userRoutes = require("./routes/user_routes.js");
+const orderRoutes = require("./routes/order_routes.js");
+const authRoutes = require("./routes/auth_routes.js");
 
 const PORT = 8000;
 const app = express();
