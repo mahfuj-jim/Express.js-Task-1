@@ -8,45 +8,41 @@ const mongoose = require("mongoose");
 class RestaurantController {
   async getAllRestaurantData(req, res) {
     try {
+      const {
+        filterOption,
+        filter,
+        sortOption,
+        sort,
+        search,
+        menuPrice,
+        priceComparison,
+        menuSort,
+      } = req.query;
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
-      const filterOption = req.query.filterOption;
-      const filter = req.query.filter;
-      const sortOption = req.query.sortOption;
-      const sort = req.query.sort || "asc";
-      const search = req.query.search;
-      const menuPrice = parseFloat(req.query.menuPrice);
-      const priceComparison = req.query.priceComparison;
       let query = {};
       let sortObj = {};
-
-      if (page < 1 || limit < 0) {
-        return failure(
-          res,
-          HTTP_STATUS.UNPROCESSABLE_ENTITY,
-          HTTP_RESPONSE.UNPROCESSABLE_ENTITY,
-          RESPONSE_MESSAGE.INVALID_DATA
-        );
-      }
 
       if (filterOption && filter) {
         switch (filterOption) {
           case "cuisine":
-            const cuisines = filter.split(",");
+            const cuisines = filter.split(",").map((cuisine) => cuisine.trim());
             const cuisineRegex = cuisines.map(
               (cuisine) => new RegExp(cuisine, "i")
             );
             query.cuisine = { $in: cuisineRegex };
             break;
           case "location":
-            const locations = filter.split(",");
+            const locations = filter
+              .split(",")
+              .map((location) => location.trim());
             const locationRegex = locations.map(
               (location) => new RegExp(location, "i")
             );
             query.location = { $in: locationRegex };
             break;
           case "menu":
-            const menus = filter.split(",");
+            const menus = filter.split(",").map((menu) => menu.trim());
             const menuRegex = menus.map((menu) => new RegExp(menu, "i"));
             query["menu.dishName"] = { $in: menuRegex };
             break;
@@ -58,46 +54,22 @@ class RestaurantController {
               RESPONSE_MESSAGE.INVALID_FILTER_OPTION
             );
         }
-      } else if ((filterOption && !filter) || (!filterOption && filter)) {
-        console.log("Vlaid");
-        return failure(
-          res,
-          HTTP_STATUS.BAD_REQUEST,
-          HTTP_RESPONSE.BAD_REQUEST,
-          RESPONSE_MESSAGE.INVALID_FILTER_OPTION
-        );
       }
 
       if (sortOption && sort) {
-        if (sort === "asc" || sort === "desc") {
-          switch (sortOption) {
-            case "deliveryFee":
-              sortObj["deliveryOptions.deliveryFee"] =
-                sort === "asc" ? 1 : sort === "desc" ? -1 : 1;
-              break;
-            default:
-              return failure(
-                res,
-                HTTP_STATUS.BAD_REQUEST,
-                HTTP_RESPONSE.BAD_REQUEST,
-                RESPONSE_MESSAGE.INVALID_SORTING_OPTION
-              );
-          }
-        } else {
-          return failure(
-            res,
-            HTTP_STATUS.BAD_REQUEST,
-            HTTP_RESPONSE.BAD_REQUEST,
-            RESPONSE_MESSAGE.INVALID_SORTING_OPTION
-          );
+        switch (sortOption) {
+          case "deliveryFee":
+            sortObj["deliveryOptions.deliveryFee"] =
+              sort === "asc" ? 1 : sort === "desc" ? -1 : 1;
+            break;
+          default:
+            return failure(
+              res,
+              HTTP_STATUS.BAD_REQUEST,
+              HTTP_RESPONSE.BAD_REQUEST,
+              RESPONSE_MESSAGE.INVALID_SORTING_OPTION
+            );
         }
-      } else if (sortOption && !sort) {
-        return failure(
-          res,
-          HTTP_STATUS.BAD_REQUEST,
-          HTTP_RESPONSE.BAD_REQUEST,
-          RESPONSE_MESSAGE.INVALID_SORTING_OPTION
-        );
       }
 
       if (search) {
@@ -131,14 +103,38 @@ class RestaurantController {
           restaurant.menu = restaurant.menu.filter((item) => {
             switch (priceComparison) {
               case "greater":
-                return item.price > menuPrice;
+                return item.price >= menuPrice;
               case "less":
-                return item.price < menuPrice;
+                return item.price <= menuPrice;
               default:
                 return false;
             }
           });
         });
+      }
+
+      if (menuSort && menuSort === "asc") {
+        restaurants.forEach((restaurant) => {
+          restaurant.menu.sort((a, b) => a.price - b.price);
+        });
+      } else if (menuSort && menuSort === "desc") {
+        restaurants.forEach((restaurant) => {
+          restaurant.menu.sort((a, b) => b.price - a.price);
+        });
+      }
+
+      if (restaurants.length === 0) {
+        return success(
+          res,
+          HTTP_STATUS.OK,
+          RESPONSE_MESSAGE.NO_RESTAURANT_FOUND,
+          {
+            totalRestaurant: restaurants.length,
+            page: page,
+            restaurantPerPage: limit,
+            restaurants: restaurants,
+          }
+        );
       }
 
       writeToLogFile("Get ALl Restaurants");

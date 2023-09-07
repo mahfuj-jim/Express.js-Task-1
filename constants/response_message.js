@@ -16,7 +16,8 @@ const RESPONSE_MESSAGE = {
     INVALID_CART: "Cart is not valid to create order",
     INVALID_DATA: "Please provide valid data",
     INVALID_FILTER_OPTION: "Filter option is not valid",
-    INVALID_SORTING_OPTION: "Sorting option is not valid"
+    INVALID_SORTING_OPTION: "Sorting option is not valid",
+    NO_RESTAURANT_FOUND: "No Restaurants Found",
 };
 
 module.exports = RESPONSE_MESSAGE;
