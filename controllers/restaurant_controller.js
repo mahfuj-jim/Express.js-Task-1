@@ -15,6 +15,8 @@ class RestaurantController {
       const sortOption = req.query.sortOption;
       const sort = req.query.sort || "asc";
       const search = req.query.search;
+      const menuPrice = parseFloat(req.query.menuPrice);
+      const priceComparison = req.query.priceComparison;
       let query = {};
       let sortObj = {};
 
@@ -122,6 +124,21 @@ class RestaurantController {
           HTTP_RESPONSE.NOT_FOUND,
           RESPONSE_MESSAGE.RESTAURANT_NOT_FOUND
         );
+      }
+
+      if (menuPrice && priceComparison) {
+        restaurants.forEach((restaurant) => {
+          restaurant.menu = restaurant.menu.filter((item) => {
+            switch (priceComparison) {
+              case "greater":
+                return item.price > menuPrice;
+              case "less":
+                return item.price < menuPrice;
+              default:
+                return false;
+            }
+          });
+        });
       }
 
       writeToLogFile("Get ALl Restaurants");
