@@ -89,7 +89,7 @@ class RestaurantController {
             RESPONSE_MESSAGE.INVALID_SORTING_OPTION
           );
         }
-      } else if ((sortOption && !sort) || (!sortOption && sort)) {
+      } else if (sortOption && !sort) {
         return failure(
           res,
           HTTP_STATUS.BAD_REQUEST,
