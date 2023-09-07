@@ -11,7 +11,8 @@ const RESPONSE_MESSAGE = {
     UNAUTHORIZED: "Authentication required",
     TOKEN_EXPIRE: "Login Again",
     USER_NOT_FOUND: "User not found",
-    RESTAURANT_NOT_FOUND: "Restaurant not found"
+    RESTAURANT_NOT_FOUND: "Restaurant not found",
+    CART_ALREADY_EXISTS: "Cart already exits"
 };
 
 module.exports = RESPONSE_MESSAGE;
