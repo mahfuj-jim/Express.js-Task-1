@@ -23,36 +23,33 @@ class RestaurantController {
         );
       }
 
-      if (!filterOption) {
-        console.log("Filter Options");
-      }
-      if (!filter) {
-        console.log("Filter");
-      }
-
-      if ((filterOption && !filter) || (!filterOption && filter)) {
+      if (filterOption && filter) {
+        switch (filterOption) {
+          case "cuisine":
+            query.cuisine = { $regex: filter, $options: "i" };
+            break;
+          case "location":
+            query.location = { $regex: filter, $options: "i" };
+            break;
+          case "menu":
+            query["menu.dishName"] = { $regex: filter, $options: "i" };
+            break;
+          default:
+            return failure(
+              res,
+              HTTP_STATUS.BAD_REQUEST,
+              HTTP_RESPONSE.BAD_REQUEST,
+              RESPONSE_MESSAGE.INVALID_FILTER_OPTION
+            );
+        }
+      } else if ((filterOption && !filter) || (!filterOption && filter)) {
+        console.log("Vlaid");
         return failure(
           res,
           HTTP_STATUS.BAD_REQUEST,
           HTTP_RESPONSE.BAD_REQUEST,
           RESPONSE_MESSAGE.INVALID_FILTER_OPTION
         );
-      }
-
-      switch (filterOption) {
-        case "cuisine":
-          query.cuisine = { $regex: filter, $options: "i" };
-          break;
-        case "location":
-          query.location = { $regex: filter, $options: "i" };
-          break;
-        default:
-          return failure(
-            res,
-            HTTP_STATUS.BAD_REQUEST,
-            HTTP_RESPONSE.BAD_REQUEST,
-            RESPONSE_MESSAGE.INVALID_FILTER_OPTION
-          );
       }
 
       const restaurants = await RestaurantModel.find(query)
