@@ -16,7 +16,7 @@ const RESPONSE_MESSAGE = {
     CART_CREATED: "Cart Created Successfully",
     CART_NOT_FOUND: "Cart Not Found",
     CART_ALREADY_EXISTS: "Cart already exits",
-    CART_RESTAURANT_ERROR: "Order from the same restaurant or delete previous cart",
+    CART_RESTAURANT_ERROR: "Order from the same restaurant or delete previous ",
     INVALID_CART: "Cart is not valid to create order",
     INVALID_REQUEST: "Request is not valid",
     INVALID_DATA: "Please provide valid data",

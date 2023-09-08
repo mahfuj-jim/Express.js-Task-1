@@ -7,6 +7,13 @@ const { validateCart } = require("../middleware/cart_validator");
 const express = require("express");
 const router = express.Router();
 
+router.get(
+  "/get/:user_id",
+  validateCart,
+  validateToken,
+  validateOrderCreateToken,
+  CartController.createCart
+);
 router.post(
   "/create/:user_id",
   validateCart,

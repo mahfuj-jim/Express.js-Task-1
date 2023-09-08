@@ -7,6 +7,50 @@ const HTTP_RESPONSE = require("../constants/status_response");
 const RESPONSE_MESSAGE = require("../constants/response_message");
 
 class CartController {
+  async getCart(req, res) {
+    try {
+      const { user_id } = req.params;
+
+      const user = await UserModel.findOne({ _id: user_id });
+
+      if (!user) {
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.USER_NOT_FOUND
+        );
+      }
+
+      const currentCart = await CartModel.findOne({ users: user_id });
+      if (!currentCart) {
+        writeToLogFile(
+          `Error: Failed to Get Cart with User with ID ${user_id}`
+        );
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.CART_NOT_FOUND
+        );
+      }
+
+      writeToLogFile(`Get Cart with User with ID ${user_id}`);
+      return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, currentCart);
+    } catch (err) {
+      console.log(err);
+      writeToLogFile(
+        `Error: Failed to Get Cart with User with ID ${user_id} ${err}`
+      );
+      return failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   async createCart(req, res) {
     try {
       const { user_id } = req.params;
@@ -66,6 +110,18 @@ class CartController {
         );
       }
 
+      if (currentCart.orderList.length !== 0) {
+        writeToLogFile(
+          `Error: Failed to Create Cart with User with ID ${user_id}`
+        );
+        return failure(
+          res,
+          HTTP_STATUS.CONFLICT,
+          HTTP_RESPONSE.CONFLICT,
+          RESPONSE_MESSAGE.CART_ALREADY_EXISTS
+        );
+      }
+
       currentCart.restaurants = restaurant._id;
       currentCart.orderList = cart.orderList;
       await currentCart.save();
@@ -85,7 +141,7 @@ class CartController {
       return failure(
         res,
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        RESPONSE_MESSAGE.SIGNUP_FAILED,
+        RESPONSE_MESSAGE.FAILED_TO_PROCESS,
         HTTP_RESPONSE.INTERNAL_SERVER_ERROR
       );
     }
@@ -138,7 +194,7 @@ class CartController {
       return failure(
         res,
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        RESPONSE_MESSAGE.SIGNUP_FAILED,
+        RESPONSE_MESSAGE.FAILED_TO_PROCESS,
         HTTP_RESPONSE.INTERNAL_SERVER_ERROR
       );
     }
@@ -232,7 +288,7 @@ class CartController {
       return failure(
         res,
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        RESPONSE_MESSAGE.SIGNUP_FAILED,
+        RESPONSE_MESSAGE.FAILED_TO_PROCESS,
         HTTP_RESPONSE.INTERNAL_SERVER_ERROR
       );
     }
@@ -339,7 +395,7 @@ class CartController {
       return failure(
         res,
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        RESPONSE_MESSAGE.SIGNUP_FAILED,
+        RESPONSE_MESSAGE.FAILED_TO_PROCESS,
         HTTP_RESPONSE.INTERNAL_SERVER_ERROR
       );
     }
