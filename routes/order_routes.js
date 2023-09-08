@@ -15,5 +15,6 @@ router.post("/create/:userId", validateToken, validateOrderCreateToken, OrderCon
 router.post("/confirm", validateConfirmOrderByRestaurant, validateToken, validateOrderConfirmByRestaurantToken, OrderController.confirmOrderByRestaurant);
 router.post("/ready", validateConfirmOrderByRestaurant, validateToken, validateOrderConfirmByRestaurantToken, OrderController.handoverOrderByRestaurant);
 router.post("/destination", validateConfirmOrderByRestaurant, validateToken, validateOrderReachByRiderToken, OrderController.reachOrderByRider);
+router.post("/delivery", validateConfirmOrderByRestaurant, validateToken, validateOrderReachByRiderToken, OrderController.deliveryOrder);
 
 module.exports = router;

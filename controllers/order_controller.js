@@ -1,5 +1,6 @@
 const OrderModel = require("../models/order_model");
 const CartModel = require("../models/cart_model");
+const TransactionModel = require("../models/transaction_model");
 const UserModel = require("../models/user_model");
 const RestaurantModel = require("../models/restaurant_model");
 const RiderModel = require("../models/rider_model");
@@ -203,7 +204,7 @@ class OrderController {
       await order.save();
 
       writeToLogFile(`Confirm Order with ID ${orderId}`);
-      failure(
+      return success(
         res,
         HTTP_STATUS.OK,
         HTTP_RESPONSE.OK,
@@ -261,7 +262,7 @@ class OrderController {
       await order.save();
 
       writeToLogFile(`Handover Order with ID ${orderId}`);
-      failure(
+      return success(
         res,
         HTTP_STATUS.OK,
         HTTP_RESPONSE.OK,
@@ -319,7 +320,7 @@ class OrderController {
       await order.save();
 
       writeToLogFile(`Reach Order with ID ${orderId}`);
-      failure(
+      return success(
         res,
         HTTP_STATUS.OK,
         HTTP_RESPONSE.OK,
@@ -328,6 +329,90 @@ class OrderController {
     } catch (err) {
       console.log(err);
       writeToLogFile(`Error: Failed Reach Order ${err}`);
+      failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async deliveryOrder(req, res) {
+    try {
+      const { orderId, confirm } = req.query;
+
+      const order = await OrderModel.findOne({ _id: orderId });
+
+      if (!order) {
+        writeToLogFile(`Error: Failed Delivery Order with ID ${orderId}`);
+        failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.ORDER_NOT_FOUND
+        );
+      }
+
+      if (confirm != "true") {
+        writeToLogFile(`Error: Failed Delivery Order with ID ${orderId}`);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_DATA
+        );
+      }
+
+      if (order.orderStatus !== "Reached") {
+        writeToLogFile(`Error: Failed Delivery Order with ID ${orderId}`);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_REQUEST
+        );
+      }
+
+      const rider = await RiderModel.findOne({ _id: order.riders });
+      if (!rider) {
+        writeToLogFile(`Error: Failed Delivery Order`);
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.RIDER_NOT_FOUND
+        );
+      }
+
+      const transaction = await TransactionModel.findOne({ orders: orderId });
+
+      if (!transaction) {
+        writeToLogFile(`Error: Failed Delivery Order`);
+        return failure(
+          res,
+          HTTP_STATUS.CONFLICT,
+          HTTP_RESPONSE.CONFLICT,
+          RESPONSE_MESSAGE.TRANSACTION_NOT_MADE
+        );
+      }
+
+      order.orderStatus = "Delivered";
+      await order.save();
+
+      rider.isEngaged = false;
+      await rider.save();
+
+      writeToLogFile(`Deliveried Order with ID ${orderId}`);
+      return success(
+        res,
+        HTTP_STATUS.OK,
+        HTTP_RESPONSE.OK,
+        RESPONSE_MESSAGE.ORDER_DELIVERED
+      );
+    } catch (err) {
+      console.log(err);
+      writeToLogFile(`Error: Failed Delivery Order ${err}`);
       failure(
         res,
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
