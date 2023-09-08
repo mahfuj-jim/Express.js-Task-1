@@ -224,7 +224,7 @@ class OrderController {
     } catch (err) {
       console.log(err);
       writeToLogFile(`Error: Failed Reach Order ${err}`);
-      failure(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGE.LOGIN_FAILED, HTTP_RESPONSE.INTERNAL_SERVER_ERROR);
+      failure(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGE.FAILED_TO_PROCESS, HTTP_RESPONSE.INTERNAL_SERVER_ERROR);
     }
   }
 }
