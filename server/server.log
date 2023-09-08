@@ -532,3 +532,51 @@
 08/09/2023 12:02:27 - Error: Failed Delivery Order with ID 64f9eabd15bcde6c1c4f4e27
 08/09/2023 12:02:31 - Error: Failed Delivery Order with ID 64f9eabd15bcde6c1c4f4e27
 08/09/2023 12:02:55 - Deliveried Order with ID 64f9eabd15bcde6c1c4f4e27
+08/09/2023 12:04:05 - Error: Failed to Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:04:11 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:04:17 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:04:20 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:04:24 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:04:33 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:04:36 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:04:55 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:04:59 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:05:12 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:07:30 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:07:34 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:07:39 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:07:41 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:08:26 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:08:38 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:08:43 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:10:13 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:10:18 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:10:42 - Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:10:45 - Error: Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:11:09 - Error: Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:12:04 - Error: Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:12:04 - Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:12:22 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:12:35 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:12:41 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:12:46 - Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:19:11 - Error: Failed to Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:19:17 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:19:28 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:19:31 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:19:43 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:19:53 - Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:20:09 - Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:20:19 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:20:36 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:20:49 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 12:20:59 - Error: Failed Confirm Order with ID 64f9eabd15bcde6c1c4f4e27
+08/09/2023 12:21:14 - Error: Failed Confirm Order with ID 64fabd41e7e95959ee4e1a2e
+08/09/2023 12:21:17 - Error: Failed Confirm Order with ID 64fabd41e7e95959ee4e1a2e
+08/09/2023 12:21:22 - Error: Failed Confirm Order with ID 64fabd41e7e95959ee4e1a2e
+08/09/2023 12:21:43 - Confirm Order with ID 64fabd41e7e95959ee4e1a2e
+08/09/2023 12:21:55 - Handover Order with ID 64fabd41e7e95959ee4e1a2e
+08/09/2023 12:22:02 - Reach Order with ID 64fabd41e7e95959ee4e1a2e
+08/09/2023 12:22:12 - Error: Failed Delivery Order
+08/09/2023 12:22:18 - Complete transaction with Order ID: 64fabd41e7e95959ee4e1a2e
+08/09/2023 12:22:24 - Deliveried Order with ID 64fabd41e7e95959ee4e1a2e

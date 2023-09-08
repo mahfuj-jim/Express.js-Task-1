@@ -276,6 +276,7 @@ class CartController {
         }
       });
 
+      await currentCart.save();
 
       writeToLogFile(`Add Item to Cart with User with ID ${user_id}`);
       return success(res, HTTP_STATUS.CREATED, HTTP_RESPONSE.OK, currentCart);

@@ -180,7 +180,7 @@ class OrderController {
         );
       }
 
-      if (confirm != true) {
+      if (confirm != "true") {
         writeToLogFile(`Error: Failed Confirm Order with ID ${orderId}`);
         return failure(
           res,
