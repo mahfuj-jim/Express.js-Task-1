@@ -9,10 +9,9 @@ const router = express.Router();
 
 router.get(
   "/get/:user_id",
-  validateCart,
   validateToken,
   validateOrderCreateToken,
-  CartController.createCart
+  CartController.getCart
 );
 router.post(
   "/create/:user_id",

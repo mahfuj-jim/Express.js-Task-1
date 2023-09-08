@@ -1,4 +1,5 @@
 const OrderModel = require("../models/order_model");
+const CartModel = require("../models/cart_model");
 const UserModel = require("../models/user_model");
 const RestaurantModel = require("../models/restaurant_model");
 const RiderModel = require("../models/rider_model");
@@ -12,28 +13,38 @@ class OrderController {
     try {
       const orders = await OrderModel.find()
         .populate({
-          path: 'users',
-          select: '_id name phoneNumber',
+          path: "users",
+          select: "_id name phoneNumber",
         })
         .populate({
-          path: 'restaurants',
-          select: '_id name contactNumber location',
+          path: "restaurants",
+          select: "_id name contactNumber location",
         })
         .populate({
-          path: 'riders',
-          select: '_id name phoneNumber',
+          path: "riders",
+          select: "_id name phoneNumber",
         });
 
       if (!orders) {
         writeToLogFile(`Error: Get all order`);
-        return failure(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, RESPONSE_MESSAGE.ORDER_NOT_FOUND);
+        return failure(
+          res,
+          HTTP_STATUS.OK,
+          HTTP_RESPONSE.OK,
+          RESPONSE_MESSAGE.ORDER_NOT_FOUND
+        );
       }
 
       writeToLogFile(`Get All Order`);
       return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, orders);
     } catch (err) {
       writeToLogFile(`Error: Get All Order ${err}`);
-      return failure(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGE.SIGNUP_FAILED, HTTP_RESPONSE.INTERNAL_SERVER_ERROR);
+      return failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.SIGNUP_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -56,12 +67,22 @@ class OrderController {
         );
       }
 
-      if (!user.cart || !user.cart.restaurant || !user.cart.orderList || user.cart.orderList.length === 0) {
-        writeToLogFile(`Error: Create a Order for User with ID ${userId} Cart is not Available`);
-        return failure(res, HTTP_STATUS.BAD_REQUEST, HTTP_RESPONSE.BAD_REQUEST, RESPONSE_MESSAGE.INVALID_CART);
+      const cart = await CartModel.findOne({ users: userId });
+      if (!cart) {
+        writeToLogFile(
+          `Error: Create a Order for User with ID ${userId} Cart is not Available`
+        );
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.CART_NOT_FOUND
+        );
       }
 
-      const restaurant = await RestaurantModel.findOne({ _id: user.cart.restaurant });
+      const restaurant = await RestaurantModel.findOne({
+        _id: cart.restaurants,
+      });
       if (!restaurant) {
         return failure(
           res,
@@ -71,7 +92,7 @@ class OrderController {
         );
       }
 
-      user.cart.orderList.map((orderItem) => {
+      cart.orderList.map((orderItem) => {
         restaurant.menu.map((item) => {
           if (orderItem.dishId.toString() === item._id.toString()) {
             totalPrice += item.price * orderItem.quantity;
@@ -84,10 +105,18 @@ class OrderController {
         });
       });
 
-      const rider = await RiderModel.findOne({ isActive: true, isEngaged: false });
+      const rider = await RiderModel.findOne({
+        isActive: true,
+        isEngaged: false,
+      });
       if (!rider) {
         writeToLogFile(`Create a order for User with ID ${userId}`);
-        return success(res, HTTP_STATUS.NOT_FOUND, HTTP_RESPONSE.NOT_FOUND, RESPONSE_MESSAGE.RIDER_NOT_FOUND);
+        return success(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.RIDER_NOT_FOUND
+        );
       }
 
       const order = {
@@ -99,14 +128,19 @@ class OrderController {
         riders: rider._id,
         restaurants: restaurant._id,
         users: user._id,
-        totalPrice: totalPrice
-      }
+        totalPrice: totalPrice,
+      };
 
       const createOrder = await OrderModel.create(order);
 
       if (!createOrder) {
         writeToLogFile(`Error: Create a order for User with ID ${userId}`);
-        return failure(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGE.FAILED_CREATE_ORDER, HTTP_RESPONSE.INTERNAL_SERVER_ERROR);
+        return failure(
+          res,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          RESPONSE_MESSAGE.FAILED_CREATE_ORDER,
+          HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+        );
       }
 
       rider.isEngaged = true;
@@ -137,28 +171,53 @@ class OrderController {
 
       if (!order) {
         writeToLogFile(`Error: Failed Confirm Order with ID ${orderId}`);
-        failure(res, HTTP_STATUS.NOT_FOUND, HTTP_RESPONSE.NOT_FOUND, RESPONSE_MESSAGE.ORDER_NOT_FOUND);
+        failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.ORDER_NOT_FOUND
+        );
       }
 
-      if(confirm != true){
+      if (confirm != true) {
         writeToLogFile(`Error: Failed Confirm Order with ID ${orderId}`);
-        return failure(res, HTTP_STATUS.BAD_REQUEST, RESPONSE_MESSAGE.FAILED_TO_PROCESS, RESPONSE_MESSAGE.INVALID_DATA);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_DATA
+        );
       }
 
-      if(order.orderStatus !== "Pending"){
+      if (order.orderStatus !== "Pending") {
         writeToLogFile(`Error: Failed Confirm Order with ID ${orderId}`);
-        return failure(res, HTTP_STATUS.BAD_REQUEST, RESPONSE_MESSAGE.FAILED_TO_PROCESS, RESPONSE_MESSAGE.INVALID_REQUEST);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_REQUEST
+        );
       }
 
       order.orderStatus = "Processing";
       await order.save();
 
       writeToLogFile(`Confirm Order with ID ${orderId}`);
-      failure(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, RESPONSE_MESSAGE.ORDER_PROCESSING);
+      failure(
+        res,
+        HTTP_STATUS.OK,
+        HTTP_RESPONSE.OK,
+        RESPONSE_MESSAGE.ORDER_PROCESSING
+      );
     } catch (err) {
       console.log(err);
       writeToLogFile(`Error: Failed Confirm Order ${err}`);
-      failure(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGE.LOGIN_FAILED, HTTP_RESPONSE.INTERNAL_SERVER_ERROR);
+      failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.LOGIN_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -170,28 +229,53 @@ class OrderController {
 
       if (!order) {
         writeToLogFile(`Error: Failed Handover Order with ID ${orderId}`);
-        failure(res, HTTP_STATUS.NOT_FOUND, HTTP_RESPONSE.NOT_FOUND, RESPONSE_MESSAGE.ORDER_NOT_FOUND);
+        failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.ORDER_NOT_FOUND
+        );
       }
 
-      if(confirm != "true"){
+      if (confirm != "true") {
         writeToLogFile(`Error: Failed Handover Order with ID ${orderId}`);
-        return failure(res, HTTP_STATUS.BAD_REQUEST, RESPONSE_MESSAGE.FAILED_TO_PROCESS, RESPONSE_MESSAGE.INVALID_DATA);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_DATA
+        );
       }
 
-      if(order.orderStatus !== "Processing"){
+      if (order.orderStatus !== "Processing") {
         writeToLogFile(`Error: Failed Handover Order with ID ${orderId}`);
-        return failure(res, HTTP_STATUS.BAD_REQUEST, RESPONSE_MESSAGE.FAILED_TO_PROCESS, RESPONSE_MESSAGE.INVALID_REQUEST);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_REQUEST
+        );
       }
 
       order.orderStatus = "Ready";
       await order.save();
 
       writeToLogFile(`Handover Order with ID ${orderId}`);
-      failure(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, RESPONSE_MESSAGE.ORDER_READY);
+      failure(
+        res,
+        HTTP_STATUS.OK,
+        HTTP_RESPONSE.OK,
+        RESPONSE_MESSAGE.ORDER_READY
+      );
     } catch (err) {
       console.log(err);
       writeToLogFile(`Error: Failed Handover Order ${err}`);
-      failure(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGE.LOGIN_FAILED, HTTP_RESPONSE.INTERNAL_SERVER_ERROR);
+      failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.LOGIN_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -203,28 +287,53 @@ class OrderController {
 
       if (!order) {
         writeToLogFile(`Error: Failed Reach Order with ID ${orderId}`);
-        failure(res, HTTP_STATUS.NOT_FOUND, HTTP_RESPONSE.NOT_FOUND, RESPONSE_MESSAGE.ORDER_NOT_FOUND);
+        failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.ORDER_NOT_FOUND
+        );
       }
 
-      if(confirm != "true"){
+      if (confirm != "true") {
         writeToLogFile(`Error: Failed Reach Order with ID ${orderId}`);
-        return failure(res, HTTP_STATUS.BAD_REQUEST, RESPONSE_MESSAGE.FAILED_TO_PROCESS, RESPONSE_MESSAGE.INVALID_DATA);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_DATA
+        );
       }
 
-      if(order.orderStatus !== "Ready"){
+      if (order.orderStatus !== "Ready") {
         writeToLogFile(`Error: Failed Reach Order with ID ${orderId}`);
-        return failure(res, HTTP_STATUS.BAD_REQUEST, RESPONSE_MESSAGE.FAILED_TO_PROCESS, RESPONSE_MESSAGE.INVALID_REQUEST);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_REQUEST
+        );
       }
 
       order.orderStatus = "Reached";
       await order.save();
 
       writeToLogFile(`Reach Order with ID ${orderId}`);
-      failure(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, RESPONSE_MESSAGE.ORDER_REACHED);
+      failure(
+        res,
+        HTTP_STATUS.OK,
+        HTTP_RESPONSE.OK,
+        RESPONSE_MESSAGE.ORDER_REACHED
+      );
     } catch (err) {
       console.log(err);
       writeToLogFile(`Error: Failed Reach Order ${err}`);
-      failure(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGE.FAILED_TO_PROCESS, HTTP_RESPONSE.INTERNAL_SERVER_ERROR);
+      failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
     }
   }
 }
