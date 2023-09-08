@@ -237,6 +237,113 @@ class CartController {
       );
     }
   }
+
+  async removeItemFromCart(req, res) {
+    try {
+      const { user_id } = req.params;
+      const cart = JSON.parse(req.body);
+
+      const user = await UserModel.findOne({ _id: user_id });
+
+      if (!user) {
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.USER_NOT_FOUND
+        );
+      }
+
+      let restaurant;
+      try {
+        restaurant = await RestaurantModel.findOne({
+          _id: cart.restaurant,
+        });
+      } catch (err) {
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.RESTAURANT_NOT_FOUND
+        );
+      }
+
+      if (!restaurant) {
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.RESTAURANT_NOT_FOUND
+        );
+      }
+
+      let currentCart = await CartModel.findOne({ users: user_id });
+      if (!currentCart) {
+        writeToLogFile(
+          `Error: Failed to Remove Item to Cart with User with ID ${user_id}`
+        );
+        return success(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.CART_NOT_FOUND
+        );
+      }
+
+      if (currentCart.restaurants.toString() !== restaurant._id.toString()) {
+        writeToLogFile(
+          `Error: Failed to Remove Item to Cart with User with ID ${user_id}`
+        );
+        return success(
+          res,
+          HTTP_STATUS.CONFLICT,
+          HTTP_RESPONSE.CONFLICT,
+          RESPONSE_MESSAGE.CART_RESTAURANT_ERROR
+        );
+      }
+
+      cart.orderList.map((newItem) => {
+        const existingItem = currentCart.orderList.find(
+          (item) => item.dishId.toString() === newItem.dishId
+        );
+
+        if (existingItem && existingItem.quantity > newItem.quantity) {
+          existingItem.quantity -= newItem.quantity;
+        } else if (existingItem && existingItem.quantity <= newItem.quantity) {
+          currentCart.orderList = currentCart.orderList.filter(
+            (deleteItem) => deleteItem.dishId.toString() !== newItem.dishId
+          );
+          console.log(currentCart.orderList);
+        } else {
+          writeToLogFile(
+            `Error: Remove Item to Cart with User with ID ${user_id}`
+          );
+          return success(
+            res,
+            HTTP_STATUS.CONFLICT,
+            HTTP_RESPONSE.CONFLICT,
+            RESPONSE_MESSAGE.INVALID_DATA
+          );
+        }
+      });
+
+      await currentCart.save();
+
+      writeToLogFile(`Remove Item to Cart with User with ID ${user_id}`);
+      return success(res, HTTP_STATUS.CREATED, HTTP_RESPONSE.OK, currentCart);
+    } catch (err) {
+      console.log(err);
+      writeToLogFile(
+        `Error: Failed to Remove Cart with User with ID ${user_id} ${err}`
+      );
+      return failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.SIGNUP_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
 
 module.exports = new CartController();

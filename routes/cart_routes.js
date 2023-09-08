@@ -27,5 +27,11 @@ router.post(
   validateOrderCreateToken,
   CartController.addItemToCart
 );
+router.delete(
+  "/removeitem/:user_id",
+  validateToken,
+  validateOrderCreateToken,
+  CartController.removeItemFromCart
+);
 
 module.exports = router;
