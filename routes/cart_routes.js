@@ -20,5 +20,12 @@ router.delete(
   validateOrderCreateToken,
   CartController.deleteCart
 );
+router.post(
+  "/additem/:user_id",
+  validateCart,
+  validateToken,
+  validateOrderCreateToken,
+  CartController.addItemToCart
+);
 
 module.exports = router;
