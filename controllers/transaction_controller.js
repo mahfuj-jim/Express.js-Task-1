@@ -23,15 +23,32 @@ class TransactionController {
         );
       }
 
+      if (
+        transactionMethod !== "Cash" &&
+        transactionMethod !== "Bkash" &&
+        transactionMethod !== "Nagad"
+      ) {
+        writeToLogFile(`Error: Failed to confirm transaction`);
+        return failure(
+          res,
+          HTTP_STATUS.CONFLICT,
+          HTTP_RESPONSE.CONFLICT,
+          RESPONSE_MESSAGE.INVALID_TRANSACTION
+        );
+      }
+
       const order = await OrderModel.findOne({ _id: orderId });
       if (!order) {
-        writeToLogFile(`Error: Failed to confirm transaction ${err}`);
+        writeToLogFile(`Error: Failed to confirm transaction`);
         return failure(
           res,
           HTTP_STATUS.NOT_FOUND,
           HTTP_RESPONSE.NOT_FOUND,
           RESPONSE_MESSAGE.ORDER_NOT_FOUND
         );
+      }
+
+      if (order.orderStatus != "Reached") {
       }
 
       const newTransaction = {
@@ -51,8 +68,6 @@ class TransactionController {
           HTTP_RESPONSE.INTERNAL_SERVER_ERROR
         );
       }
-
-      console.log(transaction);
 
       writeToLogFile(`Complete transaction with Order ID: ${orderId}`);
       return success(

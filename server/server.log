@@ -580,3 +580,86 @@
 08/09/2023 12:22:12 - Error: Failed Delivery Order
 08/09/2023 12:22:18 - Complete transaction with Order ID: 64fabd41e7e95959ee4e1a2e
 08/09/2023 12:22:24 - Deliveried Order with ID 64fabd41e7e95959ee4e1a2e
+08/09/2023 14:08:02 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:08:08 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:08:13 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:11:08 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:11:11 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:11:39 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:23:48 - Error: Failed to Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:24:28 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:28:50 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:29:00 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:29:29 - Confirm Order with ID 64fadb4be45a21fd2ad4147f
+08/09/2023 14:29:35 - Handover Order with ID 64fadb4be45a21fd2ad4147f
+08/09/2023 14:29:42 - Reach Order with ID 64fadb4be45a21fd2ad4147f
+08/09/2023 14:29:52 - Complete transaction with Order ID: 64fadb4be45a21fd2ad4147f
+08/09/2023 14:30:01 - Deliveried Order with ID 64fadb4be45a21fd2ad4147f
+08/09/2023 14:35:04 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:35:07 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:35:10 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 14:47:20 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:28:58 - Get All Order
+08/09/2023 15:35:09 - Error: Create a Order for User with ID 64f7dbd2fea22fe7940a2a47 Cart is not Available
+08/09/2023 15:46:34 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:48:14 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:48:17 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:48:22 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:48:26 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:48:35 - Confirm Order with ID 64faedea5bd9142f0c74f01e
+08/09/2023 15:48:41 - Handover Order with ID 64faedea5bd9142f0c74f01e
+08/09/2023 15:48:48 - Reach Order with ID 64faedea5bd9142f0c74f01e
+08/09/2023 15:48:54 - Complete transaction with Order ID: 64faedea5bd9142f0c74f01e
+08/09/2023 15:48:59 - Deliveried Order with ID 64faedea5bd9142f0c74f01e
+08/09/2023 15:50:28 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:50:33 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:50:36 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:50:50 - Confirm Order with ID 64faee688e3e8b80372a0db4
+08/09/2023 15:50:55 - Handover Order with ID 64faee688e3e8b80372a0db4
+08/09/2023 15:50:58 - Reach Order with ID 64faee688e3e8b80372a0db4
+08/09/2023 15:51:05 - Error: Failed Delivery Order
+08/09/2023 15:51:11 - Complete transaction with Order ID: 64faee688e3e8b80372a0db4
+08/09/2023 15:51:15 - Deliveried Order with ID 64faee688e3e8b80372a0db4
+08/09/2023 15:57:43 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:57:47 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:57:50 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:57:54 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 15:58:06 - Confirm Order with ID 64faf0225175fda63c9f7fd1
+08/09/2023 15:58:09 - Handover Order with ID 64faf0225175fda63c9f7fd1
+08/09/2023 15:58:13 - Reach Order with ID 64faf0225175fda63c9f7fd1
+08/09/2023 15:58:25 - Error: Failed to confirm transaction
+08/09/2023 15:58:33 - Error: Failed to confirm transaction
+08/09/2023 15:58:56 - Error: Failed to confirm transaction
+08/09/2023 15:58:58 - Error: Failed to confirm transaction
+08/09/2023 15:59:38 - Error: Failed to confirm transaction
+08/09/2023 15:59:58 - Error: Failed to confirm transaction
+08/09/2023 16:00:14 - Error: Failed to confirm transaction
+08/09/2023 16:00:40 - Error: Failed to confirm transaction
+08/09/2023 16:00:43 - Error: Failed to confirm transaction
+08/09/2023 16:01:02 - Error: Failed to confirm transaction
+08/09/2023 16:01:19 - Error: Failed to confirm transaction
+08/09/2023 16:01:41 - Error: Failed to confirm transaction
+08/09/2023 16:01:58 - Error: Failed to confirm transaction
+08/09/2023 16:02:24 - Error: Failed to confirm transaction
+08/09/2023 16:03:01 - Error: Failed to confirm transaction
+08/09/2023 16:03:41 - Complete transaction with Order ID: 64faf0225175fda63c9f7fd1
+08/09/2023 16:04:12 - Deliveried Order with ID 64faf0225175fda63c9f7fd1
+08/09/2023 16:07:15 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:13:47 - Error: Failed to Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:15:06 - Error: Failed to Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:15:15 - Error: Failed to Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:15:19 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:16:09 - Error: Failed to Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:16:13 - Error: Failed to Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:16:48 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:17:30 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:18:09 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:18:31 - Confirm Order with ID 64faf4e19f4eb8c211b1b7e5
+08/09/2023 16:18:37 - Handover Order with ID 64faf4e19f4eb8c211b1b7e5
+08/09/2023 16:19:01 - Reach Order with ID 64faf4e19f4eb8c211b1b7e5
+08/09/2023 16:19:13 - Complete transaction with Order ID: 64faf0225175fda63c9f7fd1
+08/09/2023 16:19:18 - Complete transaction with Order ID: 64faf4e19f4eb8c211b1b7e5
+08/09/2023 16:19:22 - Deliveried Order with ID 64faf4e19f4eb8c211b1b7e5
+08/09/2023 16:21:52 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:22:22 - Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 16:22:39 - Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47

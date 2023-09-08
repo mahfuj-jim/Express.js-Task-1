@@ -69,7 +69,7 @@ class OrderController {
       }
 
       const cart = await CartModel.findOne({ users: userId });
-      if (!cart) {
+      if (!cart || !cart.restaurants || !cart.orderList || cart.orderList.length === 0) {
         writeToLogFile(
           `Error: Create a Order for User with ID ${userId} Cart is not Available`
         );
@@ -147,8 +147,9 @@ class OrderController {
       rider.isEngaged = true;
       await rider.save();
 
-      user.cart = null;
-      await user.save();
+      cart.restaurants = null;
+      cart.orderList = [];
+      await cart.save();
 
       writeToLogFile(`Create a order for User with ID ${userId}`);
       return success(res, HTTP_STATUS.CREATED, HTTP_RESPONSE.OK, createOrder);

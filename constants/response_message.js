@@ -23,6 +23,7 @@ const RESPONSE_MESSAGE = {
     INVALID_FILTER_OPTION: "Filter option is not valid",
     INVALID_SORTING_OPTION: "Sorting option is not valid",
     NO_RESTAURANT_FOUND: "No Restaurants Found",
+    INVALID_MENU: "Menu is not valid",
     DELETE_CART: "Cart Deleted Successfully",
     FAILED_CREATE_ORDER: "Failed to create order",
     ORDER_NOT_FOUND: "Order not found",
@@ -32,7 +33,8 @@ const RESPONSE_MESSAGE = {
     ORDER_DELIVERED: "Order has been delivered",
     FAILED_TO_PROCESS: "Failed to Process",
     TRANSACTION_COMPLETE: "Complete Transaction",
-    TRANSACTION_NOT_MADE: "Transaction is not made"
+    TRANSACTION_NOT_MADE: "Transaction is not made",
+    INVALID_TRANSACTION: "Invalid Transaction"
 };
 
 module.exports = RESPONSE_MESSAGE;

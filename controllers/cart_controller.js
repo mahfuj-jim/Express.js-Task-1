@@ -80,6 +80,24 @@ class CartController {
         );
       }
 
+      cart.orderList.map((orderItem) => {
+        const menuExists = restaurant.menu.find(
+          (menu) => orderItem.dishId === menu._id.toString()
+        );
+
+        if (!menuExists) {
+          writeToLogFile(
+            `Error: Failed to Create Cart with User with ID ${user_id}`
+          );
+          return failure(
+            res,
+            HTTP_STATUS.NOT_FOUND,
+            HTTP_RESPONSE.NOT_FOUND,
+            RESPONSE_MESSAGE.INVALID_MENU
+          );
+        }
+      });
+
       let currentCart = await CartModel.findOne({ users: user_id });
       if (!currentCart) {
         const newCart = {
@@ -175,6 +193,30 @@ class CartController {
         );
       }
 
+      try {
+        if (currentCart.restaurants.toString() !== restaurant._id.toString()) {
+          writeToLogFile(
+            `Error: Failed to Add Item to Cart with User with ID ${user_id}`
+          );
+          return failure(
+            res,
+            HTTP_STATUS.CONFLICT,
+            HTTP_RESPONSE.CONFLICT,
+            RESPONSE_MESSAGE.CART_RESTAURANT_ERROR
+          );
+        }
+      } catch (err) {
+        writeToLogFile(
+          `Error: Failed to Add Item to Cart with User with ID ${user_id}`
+        );
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.CART_NOT_FOUND
+        );
+      }
+
       currentCart.restaurants = null;
       currentCart.orderList = [];
       await currentCart.save();
@@ -239,6 +281,24 @@ class CartController {
         );
       }
 
+      cart.orderList.map((orderItem) => {
+        const menuExists = restaurant.menu.find(
+          (menu) => orderItem.dishId === menu._id.toString()
+        );
+
+        if (!menuExists) {
+          writeToLogFile(
+            `Error: Failed to Add Item to Cart with User with ID ${user_id}`
+          );
+          return failure(
+            res,
+            HTTP_STATUS.NOT_FOUND,
+            HTTP_RESPONSE.NOT_FOUND,
+            RESPONSE_MESSAGE.INVALID_MENU
+          );
+        }
+      });
+
       let currentCart = await CartModel.findOne({ users: user_id });
       if (!currentCart) {
         writeToLogFile(
@@ -252,15 +312,27 @@ class CartController {
         );
       }
 
-      if (currentCart.restaurants.toString() !== restaurant._id.toString()) {
+      try {
+        if (currentCart.restaurants.toString() !== restaurant._id.toString()) {
+          writeToLogFile(
+            `Error: Failed to Add Item to Cart with User with ID ${user_id}`
+          );
+          return failure(
+            res,
+            HTTP_STATUS.CONFLICT,
+            HTTP_RESPONSE.CONFLICT,
+            RESPONSE_MESSAGE.CART_RESTAURANT_ERROR
+          );
+        }
+      } catch (err) {
         writeToLogFile(
           `Error: Failed to Add Item to Cart with User with ID ${user_id}`
         );
-        return success(
+        return failure(
           res,
-          HTTP_STATUS.CONFLICT,
-          HTTP_RESPONSE.CONFLICT,
-          RESPONSE_MESSAGE.CART_RESTAURANT_ERROR
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.CART_NOT_FOUND
         );
       }
 
@@ -338,7 +410,7 @@ class CartController {
         writeToLogFile(
           `Error: Failed to Remove Item to Cart with User with ID ${user_id}`
         );
-        return success(
+        return failure(
           res,
           HTTP_STATUS.NOT_FOUND,
           HTTP_RESPONSE.NOT_FOUND,
@@ -346,15 +418,27 @@ class CartController {
         );
       }
 
-      if (currentCart.restaurants.toString() !== restaurant._id.toString()) {
+      try {
+        if (currentCart.restaurants.toString() !== restaurant._id.toString()) {
+          writeToLogFile(
+            `Error: Failed to Add Item to Cart with User with ID ${user_id}`
+          );
+          return failure(
+            res,
+            HTTP_STATUS.CONFLICT,
+            HTTP_RESPONSE.CONFLICT,
+            RESPONSE_MESSAGE.CART_RESTAURANT_ERROR
+          );
+        }
+      } catch (err) {
         writeToLogFile(
-          `Error: Failed to Remove Item to Cart with User with ID ${user_id}`
+          `Error: Failed to Add Item to Cart with User with ID ${user_id}`
         );
-        return success(
+        return failure(
           res,
-          HTTP_STATUS.CONFLICT,
-          HTTP_RESPONSE.CONFLICT,
-          RESPONSE_MESSAGE.CART_RESTAURANT_ERROR
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.CART_NOT_FOUND
         );
       }
 
