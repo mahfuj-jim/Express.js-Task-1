@@ -9,12 +9,10 @@ const RESPONSE_MESSAGE = require("../constants/response_message");
 class TransactionController {
   async confirmTransaction(req, res) {
     try {
-      return failure(
-        res,
-        HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        RESPONSE_MESSAGE.FAILED_TO_PROCESS,
-        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
-      );
+      const { orderId, confirm } = req.query;
+      
+      writeToLogFile(`Complete transaction with Order ID: ${orderId}`);
+      return success(res, HTTP_STATUS.CREATED, HTTP_RESPONSE.CREATED, RESPONSE_MESSAGE.TRANSACTION_COMPLETE);
     } catch (err) {
       console.log(err);
       writeToLogFile(`Error: Failed to confirm transaction ${err}`);

@@ -6,10 +6,10 @@ const transactionSchema = new mongoose.Schema(
       type: Date,
       required: [true, "Time is not provided"],
     },
-    transactionOption: {
+    transactionMethod: {
       type: String,
       enum: ["Cash", "Bkash", "Nagad"],
-      required: [true, "Transaction Option is not provided"],
+      required: [true, "Transaction Method is not provided"],
     },
     transactionId: {
       type: String,

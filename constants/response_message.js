@@ -26,7 +26,8 @@ const RESPONSE_MESSAGE = {
     ORDER_PROCESSING: "Order is Processing",
     ORDER_READY: "Order is Ready",
     ORDER_REACHED: "Rider has reached the destination",
-    FAILED_TO_PROCESS: "Failed to Process"
+    FAILED_TO_PROCESS: "Failed to Process",
+    TRANSACTION_COMPLETE: "Complete Transaction"
 };
 
 module.exports = RESPONSE_MESSAGE;
