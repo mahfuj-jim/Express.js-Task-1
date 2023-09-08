@@ -6,6 +6,7 @@ const adminRoutes = require("./routes/admin_routes.js");
 const authRoutes = require("./routes/auth_routes.js");
 const userRoutes = require("./routes/user_routes.js");
 const restaurantRoutes = require("./routes/restaurant_routes.js");
+const cartRoutes = require("./routes/cart_routes.js");
 const orderRoutes = require("./routes/order_routes.js");
 const transactionRoutes = require("./routes/transaction_routes.js");
 
@@ -21,6 +22,7 @@ app.use("/admin", adminRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/restaurant", restaurantRoutes);
+app.use("/cart", cartRoutes);
 app.use("/order", orderRoutes);
 app.use("/transaction", transactionRoutes);
 

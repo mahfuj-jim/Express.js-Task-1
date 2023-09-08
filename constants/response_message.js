@@ -13,6 +13,7 @@ const RESPONSE_MESSAGE = {
     USER_NOT_FOUND: "User not found",
     RESTAURANT_NOT_FOUND: "Restaurant not found",
     RIDER_NOT_FOUND: "No Rider Found",
+    CART_CREATED: "Cart Created Successfully",
     CART_ALREADY_EXISTS: "Cart already exits",
     INVALID_CART: "Cart is not valid to create order",
     INVALID_REQUEST: "Request is not valid",

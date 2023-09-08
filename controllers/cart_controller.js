@@ -1,3 +1,4 @@
+const CartModel = require("../models/cart_model");
 const UserModel = require("../models/user_model");
 const RestaurantModel = require("../models/restaurant_model");
 const { success, failure, writeToLogFile } = require("../util/common.js");
@@ -22,18 +23,6 @@ class CartController {
         );
       }
 
-      if (
-        user.cart.restaurant &&
-        user.cart.restaurant.toString() !== cart.restaurant
-      ) {
-        return failure(
-          res,
-          HTTP_STATUS.NOT_FOUND,
-          HTTP_RESPONSE.CONFLICT,
-          RESPONSE_MESSAGE.CART_ALREADY_EXISTS
-        );
-      }
-
       const restaurant = await RestaurantModel.findOne({
         _id: cart.restaurant,
       });
@@ -47,11 +36,47 @@ class CartController {
         );
       }
 
-      user.cart = cart;
-      await user.save();
+      let currentCart = await CartModel.findOne({ users: user_id });
+      if (!currentCart) {
+        const newCart = {
+          users: user_id,
+          restaurants: restaurant._id,
+          orderList: cart.orderList,
+        };
 
-      writeToLogFile(`Create Cart with User with ID ${user_id}`);
-      return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, user.cart);
+        const createdCart = await CartModel.create(newCart);
+        if (!createdCart) {
+          writeToLogFile(
+            `Error: Failed to Create Cart with User with ID ${user_id}`
+          );
+          return failure(
+            res,
+            HTTP_STATUS.INTERNAL_SERVER_ERROR,
+            RESPONSE_MESSAGE.SIGNUP_FAILED,
+            HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+          );
+        }
+
+        writeToLogFile(`Cart with User with ID ${user_id}`);
+        return success(
+          res,
+          HTTP_STATUS.CREATED,
+          HTTP_RESPONSE.CREATED,
+          createdCart
+        );
+      }
+
+      currentCart.restaurants = restaurant._id;
+      currentCart.orderList = cart.orderList;
+      await currentCart.save();
+
+      writeToLogFile(`Cart with User with ID ${user_id}`);
+      return success(
+        res,
+        HTTP_STATUS.CREATED,
+        HTTP_RESPONSE.CREATED,
+        currentCart
+      );
     } catch (err) {
       console.log(err);
       writeToLogFile(
@@ -81,16 +106,16 @@ class CartController {
         );
       }
 
-      user.cart = null;
-      await user.save();
+      // user.cart = null;
+      // await user.save();
 
-      writeToLogFile(`Delete Cart with User with ID ${user_id}`);
-      return success(
-        res,
-        HTTP_STATUS.OK,
-        HTTP_RESPONSE.NO_CONTENT,
-        RESPONSE_MESSAGE.DELETE_CART
-      );
+      // writeToLogFile(`Delete Cart with User with ID ${user_id}`);
+      // return success(
+      //   res,
+      //   HTTP_STATUS.OK,
+      //   HTTP_RESPONSE.NO_CONTENT,
+      //   RESPONSE_MESSAGE.DELETE_CART
+      // );
     } catch (err) {
       console.log(err);
       writeToLogFile(

@@ -1,6 +1,6 @@
 const { failure } = require("../util/common.js");
 const HTTP_STATUS = require("../constants/status_codes.js");
-const RESPONSE_MESSAGE = require("../constants/response_message");
+const RESPONSE_MESSAGE = require("../constants/response_message.js");
 
 function validateCart(req, res, next) {
   const { restaurant, orderList } = JSON.parse(req.body);
