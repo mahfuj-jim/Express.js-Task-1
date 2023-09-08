@@ -22,7 +22,7 @@ class AuthController {
                 return failure(res, HTTP_STATUS.CONFLICT, RESPONSE_MESSAGE.SIGNUP_FAILED, RESPONSE_MESSAGE.EMAIL_EXIST);
             }
 
-            const newInstance = response;
+            let newInstance = response;
             delete newInstance.role;
             delete newInstance.password;
 
@@ -49,6 +49,7 @@ class AuthController {
                         return failure(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGE.SIGNUP_FAILED, HTTP_RESPONSE.INTERNAL_SERVER_ERROR);
                     });
             } else if (role === 3) {
+                newInstance = { ...newInstance, isActive: false, isEngaged: false };
                 await RiderModel.create(newInstance)
                     .then(async (createdRider) => {
                         id = createdRider._id;

@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema(
             default: [],
         },
         cart: {
+            _id: false,
             restaurant: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "restaurants", 

@@ -66,7 +66,6 @@ class UserController {
     try {
       const { user_id } = req.params;
       const cart = JSON.parse(req.body);
-      let orderList = [];
 
       const user = await UserModel.findOne({ _id: user_id });
 
@@ -101,19 +100,6 @@ class UserController {
         );
       }
 
-      cart.orderList.map((orderItem) => {
-        restaurant.menu.map((item) => {
-          if (orderItem.dishId === item._id.toString()) {
-            orderList.push({
-              dishName: item.dishName,
-              price: item.price,
-              quantity: orderItem.quantity,
-            });
-          }
-        });
-      });
-
-      cart.orderList = orderList;
       user.cart = cart;
       await user.save();
 
@@ -123,6 +109,40 @@ class UserController {
       console.log(err);
       writeToLogFile(
         `Error: Failed to Create Cart with User with ID ${user_id} ${err}`
+      );
+      return failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.SIGNUP_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async deleteCart(req, res) {
+    try {
+      const { user_id } = req.params;
+
+      const user = await UserModel.findOne({ _id: user_id });
+
+      if (!user) {
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.USER_NOT_FOUND
+        );
+      }
+
+      user.cart = null;
+      await user.save();
+
+      writeToLogFile(`Delete Cart with User with ID ${user_id}`);
+      return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.NO_CONTENT, RESPONSE_MESSAGE.DELETE_CART);
+    } catch (err) {
+      console.log(err);
+      writeToLogFile(
+        `Error: Failed to Delete Cart with User with ID ${user_id} ${err}`
       );
       return failure(
         res,

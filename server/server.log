@@ -406,3 +406,72 @@
 07/09/2023 16:43:32 - Get ALl Restaurants
 07/09/2023 16:43:47 - Get ALl Restaurants
 07/09/2023 16:53:08 - Get ALl Restaurants
+07/09/2023 20:08:44 - Get ALl Restaurants
+07/09/2023 20:11:15 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:15:17 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:15:27 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:16:10 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:19:27 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:19:29 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:19:30 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:19:31 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:24:20 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:24:38 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:25:02 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:25:40 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:25:42 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:25:48 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:25:55 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:29:05 - Error: Failed to Signup TypeError: Assignment to constant variable.
+07/09/2023 20:29:25 - Auth: Successfully Signup Role: 3 and ID: 64f9de4585e8cb0de0d6f9e1
+07/09/2023 20:32:41 - Auth: Successfully Login Role: 3 and ID: 64f9de4585e8cb0de0d6f9e5
+07/09/2023 20:36:05 - Error: Failed to Create Order for UserReferenceError: err is not defined
+07/09/2023 20:37:03 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:37:09 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:37:56 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:38:41 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:39:09 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:39:43 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:43:45 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:44:04 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:44:22 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:46:39 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:47:06 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:47:55 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:51:09 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 20:51:11 - Error: Create a Order for User with ID 64f7dbd2fea22fe7940a2a47 Cart is not Available
+07/09/2023 20:58:15 - Error: Create a Order for User with ID 64f7dbd2fea22fe7940a2a47 Cart is not Available
+07/09/2023 21:07:51 - Auth: Successfully Login Admin and ID: 64f7fad9c0467c46c4ec9592
+07/09/2023 21:08:43 - Get All Order
+07/09/2023 21:08:57 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 21:09:01 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 21:09:16 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 21:09:21 - Get All Order
+07/09/2023 21:12:41 - Get All Order
+07/09/2023 21:12:52 - Error: Get All Order
+07/09/2023 21:12:53 - Error: Get All Order
+07/09/2023 21:13:19 - Error: Get All Order StrictPopulateError: Cannot populate path `users` because it is not in your schema. Set the `strictPopulate` option to false to override.
+07/09/2023 21:16:20 - Error: Get All Order StrictPopulateError: Cannot populate path `users` because it is not in your schema. Set the `strictPopulate` option to false to override.
+07/09/2023 21:16:22 - Error: Get All Order StrictPopulateError: Cannot populate path `users` because it is not in your schema. Set the `strictPopulate` option to false to override.
+07/09/2023 21:16:48 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 21:16:54 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 21:16:58 - Error: Get All Order StrictPopulateError: Cannot populate path `users` because it is not in your schema. Set the `strictPopulate` option to false to override.
+07/09/2023 21:18:10 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 21:18:12 - Error: Failed to Create Order for UserValidationError: users: User is not provided, restaurants: Restaurant is not provided
+07/09/2023 21:18:16 - Error: Failed to Create Order for UserValidationError: users: User is not provided, restaurants: Restaurant is not provided
+07/09/2023 21:19:05 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 21:19:24 - Get All Order
+07/09/2023 21:22:34 - Create Cart with User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 21:22:37 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+07/09/2023 21:22:50 - Get All Order
+07/09/2023 21:23:40 - Get All Order
+07/09/2023 21:59:31 - Auth: Successfully Login Role: 2 and ID: 64f7ec71503c5fde848aea4e
+07/09/2023 22:16:26 - Confirm Order with ID 64f9eabd15bcde6c1c4f4e27
+07/09/2023 22:24:31 - Error: Failed Handover Order with ID 64f9eabd15bcde6c1c4f4e27
+07/09/2023 22:24:46 - Error: Failed Handover Order with ID 64f9eabd15bcde6c1c4f4e27
+07/09/2023 22:25:02 - Handover Order with ID 64f9eabd15bcde6c1c4f4e27
+07/09/2023 22:25:23 - Handover Order with ID 64f9eabd15bcde6c1c4f4e27
+07/09/2023 22:25:34 - Handover Order with ID 64f9eabd15bcde6c1c4f4e27
+07/09/2023 22:26:56 - Error: Failed Handover Order with ID 64f9eabd15bcde6c1c4f4e27
+08/09/2023 07:46:03 - Auth: Successfully Login Role: 3 and ID: 64f9de4585e8cb0de0d6f9e5
+08/09/2023 07:49:03 - Reach Order with ID 64f9eabd15bcde6c1c4f4e27

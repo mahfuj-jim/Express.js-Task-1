@@ -12,12 +12,21 @@ const RESPONSE_MESSAGE = {
     TOKEN_EXPIRE: "Login Again",
     USER_NOT_FOUND: "User not found",
     RESTAURANT_NOT_FOUND: "Restaurant not found",
+    RIDER_NOT_FOUND: "No Rider Found",
     CART_ALREADY_EXISTS: "Cart already exits",
     INVALID_CART: "Cart is not valid to create order",
+    INVALID_REQUEST: "Request is not valid",
     INVALID_DATA: "Please provide valid data",
     INVALID_FILTER_OPTION: "Filter option is not valid",
     INVALID_SORTING_OPTION: "Sorting option is not valid",
     NO_RESTAURANT_FOUND: "No Restaurants Found",
+    DELETE_CART: "Cart Deleted Successfully",
+    FAILED_CREATE_ORDER: "Failed to create order",
+    ORDER_NOT_FOUND: "Order not found",
+    ORDER_PROCESSING: "Order is Processing",
+    ORDER_READY: "Order is Ready",
+    ORDER_REACHED: "Rider has reached the destination",
+    FAILED_TO_PROCESS: "Failed to Process"
 };
 
 module.exports = RESPONSE_MESSAGE;

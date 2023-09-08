@@ -36,6 +36,14 @@ const riderSchema = new mongoose.Schema(
             unique: true,
             required: [true, "NID number is not provided"],
         },
+        isActive: {
+            type: Boolean,
+            required: [true, "IsActive is not provided"],
+        },
+        isEngaged: {
+            type: Boolean,
+            required: [true, "IsEngaged is not provided"],
+        },
     },
     {
         timestamps: true,
