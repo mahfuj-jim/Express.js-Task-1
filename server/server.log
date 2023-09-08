@@ -516,3 +516,10 @@
 08/09/2023 11:02:31 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
 08/09/2023 11:10:31 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
 08/09/2023 11:10:56 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+08/09/2023 11:19:26 - Get All Order
+08/09/2023 11:19:43 - Complete transaction with Order ID: 64f9eabd15bcde6c1c4f4e27
+08/09/2023 11:22:13 - Error: Failed to confirm transaction ReferenceError: order is not defined
+08/09/2023 11:22:31 - Complete transaction with Order ID: 64f9eabd15bcde6c1c4f4e27
+08/09/2023 11:23:10 - Complete transaction with Order ID: 64f9eabd15bcde6c1c4f4e27
+08/09/2023 11:32:59 - Error: Failed Confirm Transaction with Order ID 64f9eabd15bcde6c1c4f4e27
+08/09/2023 11:33:30 - Complete transaction with Order ID: 64f9eabd15bcde6c1c4f4e27
