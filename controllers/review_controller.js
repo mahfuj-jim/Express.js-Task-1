@@ -1,6 +1,9 @@
+const RestaurantModel = require("../models/restaurant_model");
+const RiderModel = require("../models/rider_model");
 const OrderModel = require("../models/order_model");
 const ReviewModel = require("../models/review_model");
 const { success, failure, writeToLogFile } = require("../util/common.js");
+const { decodeToken } = require("../util/token_generator");
 const HTTP_STATUS = require("../constants/status_codes.js");
 const HTTP_RESPONSE = require("../constants/status_response");
 const RESPONSE_MESSAGE = require("../constants/response_message");
@@ -10,6 +13,7 @@ class ReviewController {
   async addRestaurantReview(req, res) {
     try {
       const { orderId, comment, rating } = JSON.parse(req.body);
+      let totalReview = 0;
 
       const validOrderId = mongoose.Types.ObjectId.isValid(orderId);
       if (!validOrderId) {
@@ -49,6 +53,28 @@ class ReviewController {
         );
       }
 
+      const token = decodeToken(req);
+      if (token.user._id !== order.users.toString()) {
+        return failure(
+          res,
+          HTTP_STATUS.UNAUTHORIZED,
+          HTTP_RESPONSE.UNAUTHORIZED,
+          RESPONSE_MESSAGE.UNAUTHORIZED
+        );
+      }
+
+      const restaurantReviews = await ReviewModel.find({
+        restaurants: order.restaurants,
+      });
+      restaurantReviews.map((review) => {
+        totalReview += review.rating;
+      });
+
+      let restaurant = await RestaurantModel.findOne({
+        _id: order.restaurants,
+      }).exec();
+      restaurant.rating = (totalReview + rating) / (restaurantReviews.length + 1);
+
       const newReview = {
         users: order.users,
         restaurants: order.restaurants,
@@ -64,7 +90,9 @@ class ReviewController {
       if (existingReview) {
         existingReview.comment = comment;
         existingReview.rating = rating;
+
         await existingReview.save();
+        await restaurant.save();
 
         writeToLogFile(`Add review for Restaurant`);
         return success(
@@ -75,6 +103,7 @@ class ReviewController {
         );
       }
 
+      await restaurant.save();
       const createdReview = await ReviewModel.create(newReview);
       if (!createdReview) {
         writeToLogFile(
@@ -110,6 +139,7 @@ class ReviewController {
   async addRiderReview(req, res) {
     try {
       const { orderId, comment, rating } = JSON.parse(req.body);
+      let totalReview = 0;
 
       const validOrderId = mongoose.Types.ObjectId.isValid(orderId);
       if (!validOrderId) {
@@ -149,6 +179,24 @@ class ReviewController {
         );
       }
 
+      const token = decodeToken(req);
+      if (token.user._id !== order.users.toString()) {
+        return failure(
+          res,
+          HTTP_STATUS.UNAUTHORIZED,
+          HTTP_RESPONSE.UNAUTHORIZED,
+          RESPONSE_MESSAGE.UNAUTHORIZED
+        );
+      }
+
+      const riderReview = await ReviewModel.find({ riders: order.riders });
+      riderReview.map((review) => {
+        totalReview += review.rating;
+      });
+
+      let rider = await RiderModel.findOne({ _id: order.riders }).exec();
+      rider.rating = (totalReview + rating) / (riderReview.length + 1);
+
       const newReview = {
         users: order.users,
         riders: order.riders,
@@ -164,7 +212,9 @@ class ReviewController {
       if (existingReview) {
         existingReview.comment = comment;
         existingReview.rating = rating;
+
         await existingReview.save();
+        await rider.save();
 
         writeToLogFile(`Add review for Restaurant`);
         return success(
@@ -188,6 +238,7 @@ class ReviewController {
         );
       }
 
+      await rider.save();
       writeToLogFile(`Add review for Restaurant`);
       return success(
         res,
@@ -206,6 +257,8 @@ class ReviewController {
       );
     }
   }
+
+  
 }
 
 module.exports = new ReviewController();

@@ -1,4 +1,7 @@
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const generateAdminToken = async (admin) => {
   const token = jwt.sign(
@@ -71,7 +74,7 @@ const generateRiderToken = async (rider) => {
         email: rider.email,
         name: rider.name,
         phoneNumber: rider.phoneNumber,
-        nidNumber: rider.nidNumber
+        nidNumber: rider.nidNumber,
       },
       role: "rider",
     },
@@ -84,10 +87,16 @@ const generateRiderToken = async (rider) => {
   return token;
 };
 
+function decodeToken(req) {
+  const authHeader = req.header("Authorization");
+  const token = authHeader.substring(7);
+  return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+}
 
 module.exports = {
   generateAdminToken,
   generateUserToken,
   generateRestaurantToken,
-  generateRiderToken
+  generateRiderToken,
+  decodeToken
 };

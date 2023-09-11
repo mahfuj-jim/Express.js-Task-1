@@ -749,3 +749,54 @@
 11/09/2023 13:32:14 - Add review for Restaurant
 11/09/2023 13:33:52 - Add review for Restaurant
 11/09/2023 13:34:49 - Add review for Restaurant
+11/09/2023 13:45:36 - Add review for Restaurant
+11/09/2023 13:45:47 - Add review for Restaurant
+11/09/2023 13:46:07 - Add review for Restaurant
+11/09/2023 13:47:04 - Add review for Restaurant
+11/09/2023 13:52:07 - Error: Add review for Restaurant ValidationError: rating: Cast to Number failed for value "NaN" (type number) at path "rating"
+11/09/2023 13:53:05 - Error: Add review for Restaurant ValidationError: rating: Cast to Number failed for value "NaN" (type number) at path "rating"
+11/09/2023 13:53:54 - Error: Add review for Restaurant ValidationError: rating: Cast to Number failed for value "NaN" (type number) at path "rating"
+11/09/2023 13:54:45 - Error: Add review for Restaurant ValidationError: rating: Cast to Number failed for value "NaN" (type number) at path "rating"
+11/09/2023 13:55:19 - Add review for Restaurant
+11/09/2023 13:58:59 - Add review for Restaurant
+11/09/2023 14:00:17 - Add review for Restaurant
+11/09/2023 14:02:40 - Auth: Successfully Login Admin and ID: 64f7fad9c0467c46c4ec9592
+11/09/2023 14:03:01 - Get ALl Users
+11/09/2023 14:03:18 - Auth: Successfully Login Role: 1 and ID: 64f8bb3de7cf9cb2971089e6
+11/09/2023 14:03:55 - Error: Failed to Get Cart with User with ID 64f8bb3ce7cf9cb2971089e4
+11/09/2023 14:04:10 - Cart with User with ID 64f8bb3ce7cf9cb2971089e4
+11/09/2023 14:04:31 - Create a order for User with ID 64f8bb3ce7cf9cb2971089e4
+11/09/2023 14:04:42 - Confirm Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:04:47 - Handover Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:04:55 - Reach Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:05:05 - Complete transaction with Order ID: 64feca0f0027ee25e01f17d6
+11/09/2023 14:05:10 - Deliveried Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:07:07 - Error: Failed Delivery Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:07:33 - Error: Failed Delivery Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:07:53 - Error: Failed Delivery Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:09:31 - Error: Failed Delivery Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:10:46 - Error: Failed Delivery Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:11:13 - Error: Failed Delivery Order with ID 64fe9d394ec95f01c706ae86
+11/09/2023 14:11:41 - Error: Failed Delivery Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:16:18 - Error: Failed Delivery Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:20:22 - Error: Failed Delivery Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:20:29 - Error: Failed Reach Order with ID 64feca0f0027ee25e01f17d6
+11/09/2023 14:56:11 - Add review for Restaurant
+11/09/2023 14:56:48 - Add review for Restaurant
+11/09/2023 14:59:39 - Add review for Restaurant
+11/09/2023 15:00:12 - Add review for Restaurant
+11/09/2023 15:01:10 - Error: Add review for Restaurant ReferenceError: restaurantReviews is not defined
+11/09/2023 15:01:22 - Error: Add review for Restaurant ReferenceError: restaurantReviews is not defined
+11/09/2023 15:01:55 - Add review for Restaurant
+11/09/2023 15:02:31 - Add review for Restaurant
+11/09/2023 15:07:12 - Add review for Restaurant
+11/09/2023 15:08:42 - Add review for Restaurant
+11/09/2023 15:09:00 - Add review for Restaurant
+11/09/2023 15:10:20 - Add review for Restaurant
+11/09/2023 15:10:52 - Add review for Restaurant
+11/09/2023 15:12:41 - Add review for Restaurant
+11/09/2023 15:13:22 - Add review for Restaurant
+11/09/2023 15:14:23 - Add review for Restaurant
+11/09/2023 15:14:45 - Add review for Restaurant
+11/09/2023 15:15:44 - Add review for Restaurant
+11/09/2023 15:16:02 - Add review for Restaurant
