@@ -4,5 +4,6 @@ const express = require("express");
 const router = express.Router();
 
 router.post("/restaurant/", validateToken, ReviewController.addRestaurantReview);
+router.post("/rider/", validateToken, ReviewController.addRiderReview);
 
 module.exports = router;
