@@ -426,7 +426,6 @@ function validateOrderCreateToken(req, res, next) {
 
   try {
     const verifyToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
     if (verifyToken) {
       if (verifyToken.role === "admin") {
         next();

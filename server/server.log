@@ -677,3 +677,29 @@
 11/09/2023 10:04:20 - Error: Failed to Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
 11/09/2023 10:05:04 - Error: Failed to Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
 11/09/2023 10:06:27 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:15:39 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:15:57 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:16:06 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:16:12 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:16:16 - Delete Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:16:18 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:16:23 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:16:35 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:16:39 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:16:44 - Add Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:34:47 - Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:35:04 - Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:37:30 - Remove Item to Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:47:04 - Auth: Successfully Login Role: 1 and ID: 64f7dbd3fea22fe7940a2a49
+11/09/2023 10:49:26 - Error: Failed to Create Order for UserReferenceError: err is not defined
+11/09/2023 10:49:28 - Error: Failed to Create Order for UserReferenceError: err is not defined
+11/09/2023 10:50:27 - Error: Failed to Create Order for UserReferenceError: userId is not defined
+11/09/2023 10:50:38 - Error: Create a Order for User with ID 64f7dbd2fea22fe7940a2a47 Cart is not Available
+11/09/2023 10:50:56 - Get Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:50:59 - Cart with User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:51:02 - Error: Failed to Create Order for UserReferenceError: userId is not defined
+11/09/2023 10:51:54 - Error: Failed to Create Order for UserReferenceError: userId is not defined
+11/09/2023 10:51:56 - Error: Failed to Create Order for UserReferenceError: userId is not defined
+11/09/2023 10:52:45 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:53:14 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
+11/09/2023 10:53:17 - Error: Create a Order for User with ID 64f7dbd2fea22fe7940a2a47 Cart is not Available

@@ -16,6 +16,10 @@ const reviewSchema = new mongoose.Schema({
     min: 1,
     max: 5,
   },
+  time: {
+    type: Date,
+    required: [true, "Time is not provided"],
+  },
 });
 
 const restaurantSchema = new mongoose.Schema(

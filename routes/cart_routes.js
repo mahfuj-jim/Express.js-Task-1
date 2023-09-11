@@ -27,14 +27,14 @@ router.delete(
   CartController.deleteCart
 );
 router.patch(
-  "/additem/:user_id",
+  "/additem/",
   validateCart,
   validateToken,
   validateOrderCreateToken,
   CartController.addItemToCart
 );
 router.patch(
-  "/removeitem/:user_id",
+  "/removeitem/",
   validateToken,
   validateOrderCreateToken,
   CartController.removeItemFromCart

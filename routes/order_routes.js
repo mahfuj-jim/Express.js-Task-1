@@ -11,7 +11,7 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/all", validateToken, validateAdminToken, OrderController.getAllOrder);
-router.post("/create/:userId", validateToken, validateOrderCreateToken, OrderController.createOrder);
+router.post("/create/", validateToken, validateOrderCreateToken, OrderController.createOrder);
 router.post("/confirm", validateConfirmOrderByRestaurant, validateToken, validateOrderConfirmByRestaurantToken, OrderController.confirmOrderByRestaurant);
 router.post("/ready", validateConfirmOrderByRestaurant, validateToken, validateOrderConfirmByRestaurantToken, OrderController.handoverOrderByRestaurant);
 router.post("/destination", validateConfirmOrderByRestaurant, validateToken, validateOrderReachByRiderToken, OrderController.reachOrderByRider);

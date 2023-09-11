@@ -51,14 +51,14 @@ class OrderController {
 
   async createOrder(req, res) {
     try {
-      const { userId } = req.params;
+      const { user_id } = JSON.parse(req.body);
       let orderList = [];
       let totalPrice = 0;
 
-      const user = await UserModel.findOne({ _id: userId });
+      const user = await UserModel.findOne({ _id: user_id });
       if (!user) {
         writeToLogFile(
-          `Error: Create a Order for User with ID ${userId} ${err}`
+          `Error: Create a Order for User with ID ${user_id} ${err}`
         );
         return failure(
           res,
@@ -68,10 +68,10 @@ class OrderController {
         );
       }
 
-      const cart = await CartModel.findOne({ users: userId });
+      const cart = await CartModel.findOne({ users: user_id });
       if (!cart || !cart.restaurants || !cart.orderList || cart.orderList.length === 0) {
         writeToLogFile(
-          `Error: Create a Order for User with ID ${userId} Cart is not Available`
+          `Error: Create a Order for User with ID ${user_id} Cart is not Available`
         );
         return failure(
           res,
@@ -111,7 +111,7 @@ class OrderController {
         isEngaged: false,
       });
       if (!rider) {
-        writeToLogFile(`Create a order for User with ID ${userId}`);
+        writeToLogFile(`Create a order for User with ID ${user_id}`);
         return success(
           res,
           HTTP_STATUS.NOT_FOUND,
@@ -151,7 +151,7 @@ class OrderController {
       cart.orderList = [];
       await cart.save();
 
-      writeToLogFile(`Create a order for User with ID ${userId}`);
+      writeToLogFile(`Create a order for User with ID ${user_id}`);
       return success(res, HTTP_STATUS.CREATED, HTTP_RESPONSE.OK, createOrder);
     } catch (err) {
       console.log(err);
