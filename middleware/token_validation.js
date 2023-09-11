@@ -411,7 +411,7 @@ function validateRestaurantModiyToken(req, res, next) {
 
 function validateOrderCreateToken(req, res, next) {
   const authHeader = req.header("Authorization");
-  const { userId } = req.params;
+  const { user_id } = JSON.parse(req.body);
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return failure(
@@ -432,7 +432,7 @@ function validateOrderCreateToken(req, res, next) {
         next();
       } else if (
         verifyToken.role === "user" &&
-        verifyToken.user._id === userId
+        verifyToken.user._id === user_id
       ) {
         next();
       } else {
@@ -535,7 +535,12 @@ function validateOrderReachByRiderToken(req, res, next) {
   const authHeader = req.header("Authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return failure(res, HTTP_STATUS.UNAUTHORIZED, HTTP_RESPONSE.UNAUTHORIZED, RESPONSE_MESSAGE.UNAUTHORIZED);
+    return failure(
+      res,
+      HTTP_STATUS.UNAUTHORIZED,
+      HTTP_RESPONSE.UNAUTHORIZED,
+      RESPONSE_MESSAGE.UNAUTHORIZED
+    );
   }
 
   const token = authHeader.substring(7);
@@ -549,19 +554,39 @@ function validateOrderReachByRiderToken(req, res, next) {
       } else if (verifyToken.role === "rider") {
         next();
       } else {
-        return failure(res, HTTP_STATUS.UNAUTHORIZED, HTTP_RESPONSE.UNAUTHORIZED, RESPONSE_MESSAGE.UNAUTHORIZED);
+        return failure(
+          res,
+          HTTP_STATUS.UNAUTHORIZED,
+          HTTP_RESPONSE.UNAUTHORIZED,
+          RESPONSE_MESSAGE.UNAUTHORIZED
+        );
       }
     } else {
       throw new Error();
     }
   } catch (err) {
     if (err instanceof jwt.TokenExpiredError) {
-      return failure(res, HTTP_STATUS.UNAUTHORIZED, HTTP_RESPONSE.UNAUTHORIZED, RESPONSE_MESSAGE.TOKEN_EXPIRE);
+      return failure(
+        res,
+        HTTP_STATUS.UNAUTHORIZED,
+        HTTP_RESPONSE.UNAUTHORIZED,
+        RESPONSE_MESSAGE.TOKEN_EXPIRE
+      );
     }
     if (err instanceof jwt.JsonWebTokenError) {
-      return failure(res, HTTP_STATUS.UNAUTHORIZED, HTTP_RESPONSE.UNAUTHORIZED, RESPONSE_MESSAGE.UNAUTHORIZED);
+      return failure(
+        res,
+        HTTP_STATUS.UNAUTHORIZED,
+        HTTP_RESPONSE.UNAUTHORIZED,
+        RESPONSE_MESSAGE.UNAUTHORIZED
+      );
     }
-    return failure(res, HTTP_STATUS.UNAUTHORIZED, HTTP_RESPONSE.UNAUTHORIZED, RESPONSE_MESSAGE.UNAUTHORIZED);
+    return failure(
+      res,
+      HTTP_STATUS.UNAUTHORIZED,
+      HTTP_RESPONSE.UNAUTHORIZED,
+      RESPONSE_MESSAGE.UNAUTHORIZED
+    );
   }
 }
 

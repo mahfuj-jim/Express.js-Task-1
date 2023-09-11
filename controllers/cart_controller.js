@@ -9,7 +9,7 @@ const RESPONSE_MESSAGE = require("../constants/response_message");
 class CartController {
   async getCart(req, res) {
     try {
-      const { user_id } = req.params;
+      const { user_id } = JSON.parse(req.body);
 
       const user = await UserModel.findOne({ _id: user_id });
 
@@ -53,7 +53,7 @@ class CartController {
 
   async createCart(req, res) {
     try {
-      const { user_id } = req.params;
+      const { user_id } = JSON.parse(req.body);
       const cart = JSON.parse(req.body);
 
       const user = await UserModel.findOne({ _id: user_id });
@@ -167,7 +167,7 @@ class CartController {
 
   async deleteCart(req, res) {
     try {
-      const { user_id } = req.params;
+      const { user_id } = JSON.parse(req.body);
 
       const user = await UserModel.findOne({ _id: user_id });
 
@@ -186,30 +186,6 @@ class CartController {
           `Error: Failed to Delete Cart with User with ID ${user_id}`
         );
         return success(
-          res,
-          HTTP_STATUS.NOT_FOUND,
-          HTTP_RESPONSE.NOT_FOUND,
-          RESPONSE_MESSAGE.CART_NOT_FOUND
-        );
-      }
-
-      try {
-        if (currentCart.restaurants.toString() !== restaurant._id.toString()) {
-          writeToLogFile(
-            `Error: Failed to Add Item to Cart with User with ID ${user_id}`
-          );
-          return failure(
-            res,
-            HTTP_STATUS.CONFLICT,
-            HTTP_RESPONSE.CONFLICT,
-            RESPONSE_MESSAGE.CART_RESTAURANT_ERROR
-          );
-        }
-      } catch (err) {
-        writeToLogFile(
-          `Error: Failed to Add Item to Cart with User with ID ${user_id}`
-        );
-        return failure(
           res,
           HTTP_STATUS.NOT_FOUND,
           HTTP_RESPONSE.NOT_FOUND,
