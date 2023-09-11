@@ -10,6 +10,40 @@ const RESPONSE_MESSAGE = require("../constants/response_message");
 const mongoose = require("mongoose");
 
 class ReviewController {
+  async getRestaurantReview(req, res) {
+    try {
+      const { restaurantId } = JSON.parse(req.body);
+
+      const restaurantReviews = await ReviewModel.find({
+        restaurants: restaurantId,
+      })
+        .populate("restaurants", "name email contactNumber cuisine rating")
+        .populate("users", "name email phoneNumber")
+        .exec();
+
+      if(!restaurantReviews){
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.FAILED_TO_GET_REVIEW,
+        );
+      }
+
+      writeToLogFile(`Get review for Restaurant with ID ${restaurantId}`);
+      return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, restaurantReviews);
+    } catch (err) {
+      console.log(err);
+      writeToLogFile(`Error: Get review for Restaurant ${err}`);
+      return failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.FAILED_TO_GET_REVIEW,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   async addRestaurantReview(req, res) {
     try {
       const { orderId, comment, rating } = JSON.parse(req.body);
@@ -73,7 +107,8 @@ class ReviewController {
       let restaurant = await RestaurantModel.findOne({
         _id: order.restaurants,
       }).exec();
-      restaurant.rating = (totalReview + rating) / (restaurantReviews.length + 1);
+      restaurant.rating =
+        (totalReview + rating) / (restaurantReviews.length + 1);
 
       const newReview = {
         users: order.users,
@@ -131,6 +166,40 @@ class ReviewController {
         res,
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
         RESPONSE_MESSAGE.FAILED_REVIEW,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getRiderReview(req, res) {
+    try {
+      const { riderId } = JSON.parse(req.body);
+
+      const riderReviews = await ReviewModel.find({
+        riders: riderId,
+      })
+        .populate("riders", "name email phoneNumber")
+        .populate("users", "name email phoneNumber")
+        .exec();
+
+      if(!riderReviews){
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.FAILED_TO_GET_REVIEW,
+        );
+      }
+
+      writeToLogFile(`Get review for Rider with ID ${riderId}`);
+      return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, riderReviews);
+    } catch (err) {
+      console.log(err);
+      writeToLogFile(`Error: Get review for Rider ${err}`);
+      return failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.FAILED_TO_GET_REVIEW,
         HTTP_RESPONSE.INTERNAL_SERVER_ERROR
       );
     }
@@ -212,6 +281,7 @@ class ReviewController {
       if (existingReview) {
         existingReview.comment = comment;
         existingReview.rating = rating;
+        existingReview.time = new Date();
 
         await existingReview.save();
         await rider.save();
@@ -257,8 +327,6 @@ class ReviewController {
       );
     }
   }
-
-  
 }
 
 module.exports = new ReviewController();
