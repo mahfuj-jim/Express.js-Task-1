@@ -8,8 +8,8 @@ const RESPONSE_MESSAGE = require("../constants/response_message");
 class TransactionController {
   async confirmTransaction(req, res) {
     try {
-      const { orderId, confirm } = req.query;
-      const { transactionMethod, transactionId } = JSON.parse(req.body);
+      const { confirm } = req.query;
+      const { orderId, transactionMethod, transactionId } = JSON.parse(req.body);
 
       if (confirm != "true") {
         writeToLogFile(

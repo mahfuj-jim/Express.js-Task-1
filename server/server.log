@@ -703,3 +703,12 @@
 11/09/2023 10:52:45 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
 11/09/2023 10:53:14 - Create a order for User with ID 64f7dbd2fea22fe7940a2a47
 11/09/2023 10:53:17 - Error: Create a Order for User with ID 64f7dbd2fea22fe7940a2a47 Cart is not Available
+11/09/2023 11:07:45 - Auth: Successfully Login Role: 1 and ID: 64f7dbd3fea22fe7940a2a49
+11/09/2023 11:08:07 - Auth: Successfully Login Role: 2 and ID: 64f7ec71503c5fde848aea4e
+11/09/2023 11:10:51 - Confirm Order with ID 64fe9d394ec95f01c706ae86
+11/09/2023 11:14:22 - Handover Order with ID 64fe9d394ec95f01c706ae86
+11/09/2023 11:19:18 - Auth: Successfully Login Role: 2 and ID: 64f7ec71503c5fde848aea4e
+11/09/2023 11:21:49 - Auth: Successfully Login Role: 3 and ID: 64f9de4585e8cb0de0d6f9e5
+11/09/2023 11:22:27 - Reach Order with ID 64fe9d394ec95f01c706ae86
+11/09/2023 11:26:40 - Complete transaction with Order ID: 64fe9d394ec95f01c706ae86
+11/09/2023 11:35:13 - Deliveried Order with ID 64fe9d394ec95f01c706ae86

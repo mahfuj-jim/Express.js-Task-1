@@ -3,7 +3,8 @@ const HTTP_STATUS = require("../constants/status_codes.js");
 const RESPONSE_MESSAGE = require("../constants/response_message");
 
 const validateConfirmOrderByRestaurant = (req, res, next) => {
-    const { orderId, confirm } = req.query;
+    const { confirm } = req.query;
+    const { orderId } = JSON.parse(req.body);
     const errors = {};
 
     if(!orderId || orderId === ""){

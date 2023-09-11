@@ -167,7 +167,8 @@ class OrderController {
 
   async confirmOrderByRestaurant(req, res) {
     try {
-      const { orderId, confirm } = req.query;
+      const { confirm } = req.query;
+      const { orderId } = JSON.parse(req.body);
 
       const order = await OrderModel.findOne({ _id: orderId });
 
@@ -225,7 +226,8 @@ class OrderController {
 
   async handoverOrderByRestaurant(req, res) {
     try {
-      const { orderId, confirm } = req.query;
+      const { confirm } = req.query;
+      const { orderId } = JSON.parse(req.body);
 
       const order = await OrderModel.findOne({ _id: orderId });
 
@@ -283,7 +285,8 @@ class OrderController {
 
   async reachOrderByRider(req, res) {
     try {
-      const { orderId, confirm } = req.query;
+      const { confirm } = req.query;
+      const { orderId } = JSON.parse(req.body);
 
       const order = await OrderModel.findOne({ _id: orderId });
 
@@ -341,7 +344,8 @@ class OrderController {
 
   async deliveryOrder(req, res) {
     try {
-      const { orderId, confirm } = req.query;
+      const { confirm } = req.query;
+      const { orderId } = JSON.parse(req.body);
 
       const order = await OrderModel.findOne({ _id: orderId });
 
