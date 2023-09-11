@@ -712,3 +712,14 @@
 11/09/2023 11:22:27 - Reach Order with ID 64fe9d394ec95f01c706ae86
 11/09/2023 11:26:40 - Complete transaction with Order ID: 64fe9d394ec95f01c706ae86
 11/09/2023 11:35:13 - Deliveried Order with ID 64fe9d394ec95f01c706ae86
+11/09/2023 11:54:59 - Auth: Successfully Login Role: 1 and ID: 64f7dbd3fea22fe7940a2a49
+11/09/2023 12:06:20 - Error: Add review for Restaurant ValidationError: rating: Path `rating` is required.
+11/09/2023 12:07:09 - Error: Add review for Restaurant ValidationError: rating: Path `rating` is required.
+11/09/2023 12:09:51 - Add review for Restaurant
+11/09/2023 12:13:23 - Add review for Restaurant
+11/09/2023 12:14:49 - Add review for Restaurant
+11/09/2023 12:15:05 - Add review for Restaurant
+11/09/2023 12:15:23 - Error: Add review for Restaurant TypeError: existingReview.save is not a function
+11/09/2023 12:15:48 - Error: Add review for Restaurant TypeError: existingReview.save is not a function
+11/09/2023 12:16:21 - Add review for Restaurant
+11/09/2023 12:16:30 - Add review for Restaurant

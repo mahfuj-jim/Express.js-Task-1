@@ -1,4 +1,6 @@
 const RESPONSE_MESSAGE = {
+    FAILED_REVIEW: "Failed to create review",
+    REVIEW_ADDED: "Successfully review added",
     SIGNUP_SUCCESS: "Registered successfully",
     LOGIN_SUCCESS: "Login successfully",
     LOGIN_FAILED: "Failed to login",

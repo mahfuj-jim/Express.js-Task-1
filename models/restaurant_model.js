@@ -1,27 +1,5 @@
 const mongoose = require("mongoose");
 
-const reviewSchema = new mongoose.Schema({
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "users",
-    required: true,
-  },
-  comment: {
-    type: String,
-    required: true,
-  },
-  rating: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5,
-  },
-  time: {
-    type: Date,
-    required: [true, "Time is not provided"],
-  },
-});
-
 const restaurantSchema = new mongoose.Schema(
   {
     name: {
@@ -60,7 +38,6 @@ const restaurantSchema = new mongoose.Schema(
     },
     menu: [mongoose.Schema.Types.Mixed],
     rating: Number,
-    reviews: [reviewSchema],
     website: String,
   },
   {
