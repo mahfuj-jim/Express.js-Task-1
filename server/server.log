@@ -806,3 +806,20 @@
 11/09/2023 15:29:51 - Get review for Restaurant with ID 64f7ec71503c5fde848aea4c
 11/09/2023 15:32:49 - Get review for Rider with ID undefined
 11/09/2023 15:33:56 - Get review for Rider with ID 64f9de4585e8cb0de0d6f9e1
+11/09/2023 16:07:09 - Get review for Restaurant with ID 64f7ec71503c5fde848aea4c
+11/09/2023 16:07:59 - Error: Get review for Rider SyntaxError: Unexpected token o in JSON at position 1
+11/09/2023 16:08:00 - Error: Get review for Rider SyntaxError: Unexpected token o in JSON at position 1
+11/09/2023 16:08:15 - Error: Get review for Rider SyntaxError: Unexpected token o in JSON at position 1
+11/09/2023 16:08:39 - Error: Get review for Rider SyntaxError: Unexpected token o in JSON at position 1
+11/09/2023 16:08:40 - Error: Get review for Rider SyntaxError: Unexpected token o in JSON at position 1
+11/09/2023 16:09:02 - Error: Get review for Rider SyntaxError: Unexpected token o in JSON at position 1
+11/09/2023 16:09:34 - Error: Get review for Rider SyntaxError: Unexpected token o in JSON at position 1
+11/09/2023 16:09:35 - Error: Get review for Rider SyntaxError: Unexpected token o in JSON at position 1
+11/09/2023 16:09:39 - Get review for Rider with ID 64f9de4585e8cb0de0d6f9e1
+11/09/2023 16:09:51 - Add review for Restaurant
+11/09/2023 16:10:02 - Get review for Rider with ID 64f9de4585e8cb0de0d6f9e1
+11/09/2023 16:10:22 - Get review for Rider with ID 64f9de4585e8cb0de0d6f9e1
+11/09/2023 16:10:43 - Get review for Restaurant with ID 64f7ec71503c5fde848aea4c
+11/09/2023 16:14:19 - Get review for Restaurant with ID 64f7ec71503c5fde848aea4c
+11/09/2023 16:14:25 - Add review for Restaurant
+11/09/2023 16:14:29 - Get review for Rider with ID 64f9de4585e8cb0de0d6f9e1

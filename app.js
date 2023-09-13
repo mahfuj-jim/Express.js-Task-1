@@ -28,6 +28,13 @@ app.use("/cart", cartRoutes);
 app.use("/order", orderRoutes);
 app.use("/transaction", transactionRoutes);
 
+app.set("view engine", "ejs");
+
+app.get("/hello", (req, res) => {
+  console.log("Hello");
+  return res.render("hello.ejs");
+});
+
 app.use((req, res) => {
   return failure(res, 404, "Not Found", "Request Not Found");
 });

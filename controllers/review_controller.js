@@ -16,8 +16,7 @@ class ReviewController {
 
       const restaurantReviews = await ReviewModel.find({
         restaurants: restaurantId,
-      })
-        .populate("restaurants", "name email contactNumber cuisine rating")
+      }, {restaurants: false})
         .populate("users", "name email phoneNumber")
         .exec();
 
@@ -132,8 +131,8 @@ class ReviewController {
         writeToLogFile(`Add review for Restaurant`);
         return success(
           res,
-          HTTP_STATUS.CREATED,
-          HTTP_RESPONSE.CREATED,
+          HTTP_STATUS.OK,
+          HTTP_RESPONSE.OK,
           RESPONSE_MESSAGE.REVIEW_ADDED
         );
       }
@@ -177,8 +176,7 @@ class ReviewController {
 
       const riderReviews = await ReviewModel.find({
         riders: riderId,
-      })
-        .populate("riders", "name email phoneNumber")
+      }, {riders: false})
         .populate("users", "name email phoneNumber")
         .exec();
 
@@ -289,8 +287,8 @@ class ReviewController {
         writeToLogFile(`Add review for Restaurant`);
         return success(
           res,
-          HTTP_STATUS.CREATED,
-          HTTP_RESPONSE.CREATED,
+          HTTP_STATUS.OK,
+          HTTP_RESPONSE.OK,
           RESPONSE_MESSAGE.REVIEW_ADDED
         );
       }
