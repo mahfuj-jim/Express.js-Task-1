@@ -1,278 +1,266 @@
-const { success, failure } = require("../util/common.js");
-const RestaurantModel = require("../models/restaurant_model.js");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const dotenv = require("dotenv");
-
-dotenv.config();
+const RestaurantModel = require("../models/restaurant_model");
+const { success, failure, writeToLogFile } = require("../util/common.js");
+const HTTP_STATUS = require("../constants/status_codes.js");
+const HTTP_RESPONSE = require("../constants/status_response");
+const RESPONSE_MESSAGE = require("../constants/response_message");
+const mongoose = require("mongoose");
 
 class RestaurantController {
   async getAllRestaurantData(req, res) {
     try {
+      const {
+        filterOption,
+        filter,
+        sortOption,
+        sort,
+        search,
+        menuPrice,
+        priceComparison,
+        menuSort,
+      } = req.query;
       const page = parseInt(req.query.page) || 1;
-      const pageSize = parseInt(req.query.pageSize) || 10;
+      const limit = parseInt(req.query.limit) || 10;
+      let query = {};
+      let sortObj = {};
 
-      const filters = {};
+      if (filterOption && filter) {
+        switch (filterOption) {
+          case "cuisine":
+            const cuisines = filter.split(",").map((cuisine) => cuisine.trim());
+            const cuisineRegex = cuisines.map(
+              (cuisine) => new RegExp(cuisine, "i")
+            );
+            query.cuisine = { $in: cuisineRegex };
+            break;
+          case "location":
+            const locations = filter
+              .split(",")
+              .map((location) => location.trim());
+            const locationRegex = locations.map(
+              (location) => new RegExp(location, "i")
+            );
+            query.location = { $in: locationRegex };
+            break;
+          case "menu":
+            const menus = filter.split(",").map((menu) => menu.trim());
+            const menuRegex = menus.map((menu) => new RegExp(menu, "i"));
+            query["menu.dishName"] = { $in: menuRegex };
+            break;
+          default:
+            return failure(
+              res,
+              HTTP_STATUS.BAD_REQUEST,
+              HTTP_RESPONSE.BAD_REQUEST,
+              RESPONSE_MESSAGE.INVALID_FILTER_OPTION
+            );
+        }
+      }
 
-      if (req.query.minRating) {
-        filters["rating"] = { $gte: parseFloat(req.query.minRating) };
-      }
-      if (req.query.deliveryAreaContains) {
-        filters["deliveryOptions.deliveryArea"] = {
-          $regex: new RegExp(req.query.deliveryAreaContains, "i"),
-        };
-      }
-      if (req.query.maxMenuPrice) {
-        filters["menu.price"] = { $lte: parseInt(req.query.maxMenuPrice) };
-      }
-      if (req.query.maxDeliveryFee) {
-        filters["deliveryOptions.deliveryFee"] = {
-          $lte: parseInt(req.query.maxDeliveryFee),
-        };
+      if (sortOption && sort) {
+        switch (sortOption) {
+          case "deliveryFee":
+            sortObj["deliveryOptions.deliveryFee"] =
+              sort === "asc" ? 1 : sort === "desc" ? -1 : 1;
+            break;
+          default:
+            return failure(
+              res,
+              HTTP_STATUS.BAD_REQUEST,
+              HTTP_RESPONSE.BAD_REQUEST,
+              RESPONSE_MESSAGE.INVALID_SORTING_OPTION
+            );
+        }
       }
 
-      RestaurantModel.find(filters)
-        .select("-password -id")
-        .then((restaurantData) => {
-          const startIndex = (page - 1) * pageSize;
-          const endIndex = startIndex + pageSize;
-          const paginatedRestaurants = restaurantData.slice(
-            startIndex,
-            endIndex
-          );
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: "i" } },
+          { location: { $regex: search, $options: "i" } },
+          { "deliveryOptions.deliveryArea": { $regex: search, $options: "i" } },
+          { cuisine: { $regex: search, $options: "i" } },
+          { "menu.dishName": { $regex: search, $options: "i" } },
+        ];
+      }
 
-          success(res, "Successfully Received.", {
-            total_restaurant: paginatedRestaurants.length,
-            restaurants: paginatedRestaurants,
+      const restaurants = await RestaurantModel.find(query)
+        .sort(sortObj)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec();
+
+      if (!restaurants) {
+        writeToLogFile(`Error: Get All Restaurants ${err}`);
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.RESTAURANT_NOT_FOUND
+        );
+      }
+
+      if (menuPrice && priceComparison) {
+        restaurants.forEach((restaurant) => {
+          restaurant.menu = restaurant.menu.filter((item) => {
+            switch (priceComparison) {
+              case "greater":
+                return item.price >= menuPrice;
+              case "less":
+                return item.price <= menuPrice;
+              default:
+                return false;
+            }
           });
-        })
-        .catch((error) => {
-          console.log(error);
-          failure(res, 500, "Failed to get data", "Internal Server Issue");
         });
+      }
+
+      if (menuSort && menuSort === "asc") {
+        restaurants.forEach((restaurant) => {
+          restaurant.menu.sort((a, b) => a.price - b.price);
+        });
+      } else if (menuSort && menuSort === "desc") {
+        restaurants.forEach((restaurant) => {
+          restaurant.menu.sort((a, b) => b.price - a.price);
+        });
+      }
+
+      if (restaurants.length === 0) {
+        return success(
+          res,
+          HTTP_STATUS.OK,
+          RESPONSE_MESSAGE.NO_RESTAURANT_FOUND,
+          {
+            totalRestaurant: restaurants.length,
+            page: page,
+            restaurantPerPage: limit,
+            restaurants: restaurants,
+          }
+        );
+      }
+
+      writeToLogFile("Get ALl Restaurants");
+      return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, {
+        totalRestaurant: restaurants.length,
+        page: page,
+        restaurantPerPage: limit,
+        restaurants: restaurants,
+      });
     } catch (err) {
-      failure(res, 500, "Failed to get data", "Internal Server Issue");
+      writeToLogFile(`Error: Get All Restaurants ${err}`);
+      return failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.RESTAURANT_NOT_FOUND,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
   async getRestaurantById(req, res) {
     try {
       const { restaurantId } = req.params;
-      RestaurantModel.findOne({ _id: restaurantId }, { password: false })
+      RestaurantModel.findOne({ _id: restaurantId })
         .then((restaurant) => {
-          return success(res, "Successfully Received.", restaurant);
+          writeToLogFile(`Get Restaurant with ID ${restaurantId}`);
+          return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, restaurant);
         })
-        .catch((error) => {
+        .catch((err) => {
+          writeToLogFile(
+            `Error: Get Restaurant with ID ${restaurantId} ${err}`
+          );
           return failure(
             res,
-            400,
-            "Failed to get data",
-            "Restaurant not found"
+            HTTP_STATUS.INTERNAL_SERVER_ERROR,
+            RESPONSE_MESSAGE.SIGNUP_FAILED,
+            HTTP_RESPONSE.INTERNAL_SERVER_ERROR
           );
         });
     } catch (err) {
-      return failure(res, 500, "Failed to get data", "Internal Server Issue");
-    }
-  }
-
-  async createRestaurant(req, res) {
-    try {
-      let restaurant = JSON.parse(req.body);
-
-      const hashedPassword = await bcrypt.hash(restaurant.password, 10);
-      restaurant = { ...restaurant, password: hashedPassword };
-
-      RestaurantModel.create(restaurant)
-        .then((createdRestaurant) => {
-          createdRestaurant.password = undefined;
-          return success(res, "Successfully Created.", createdRestaurant);
-        })
-        .catch((error) => {
-          console.log(error);
-          return failure(
-            res,
-            500,
-            "Failed to create new restaurant",
-            "Internal Server Issue"
-          );
-        });
-    } catch (err) {
-      console.log(err);
-      failure(
+      writeToLogFile(`Error: Get Restaurant with ID ${restaurantId} ${err}`);
+      return failure(
         res,
-        500,
-        "Failed to create new restaurant",
-        "Internal Server Issue"
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.SIGNUP_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-  async updateRestaurant(req, res) {
+  async createMenuItem(req, res) {
     try {
       const { restaurantId } = req.params;
+      const { dishName, price } = JSON.parse(req.body);
 
       RestaurantModel.findOne({ _id: restaurantId })
-        .then((restaurant) => {
-          RestaurantModel.updateOne({ _id: restaurantId }, JSON.parse(req.body))
-            .then((updatedRestaurant) => {
-              return success(
-                res,
-                "Successfully Updated.",
-                JSON.parse(req.body)
-              );
-            })
-            .catch((error) => {
-              return failure(
-                res,
-                500,
-                "Failed to Update",
-                "Internal Server Issue"
-              );
-            });
-        })
-        .catch((error) => {
-          console.log(error);
-          return failure(
-            res,
-            400,
-            "Failed to get data",
-            "Restaurant not found"
-          );
-        });
-    } catch (err) {
-      failure(res, 500, "Failed to update data", "Internal Server Issue");
-    }
-  }
-
-  async deleteRestaurantById(req, res) {
-    try {
-      const { restaurantId } = req.params;
-
-      RestaurantModel.findOne({ _id: restaurantId })
-        .then((restaurant) => {
-          RestaurantModel.deleteOne({ _id: restaurantId })
-            .then((deleteed) => {
-              return success(
-                res,
-                "Successfully Executed",
-                `Delete Restaurant with ID ${restaurantId}`
-              );
-            })
-            .catch((error) => {
-              return failure(
-                res,
-                500,
-                "Failed to Update",
-                "Internal Server Issue"
-              );
-            });
-        })
-        .catch((error) => {
-          console.log(error);
-          return failure(
-            res,
-            400,
-            "Failed to get data",
-            "Restaurant not found"
-          );
-        });
-    } catch (err) {
-      failure(res, 500, "Failed to delete data", "Internal Server Issue");
-    }
-  }
-
-  // async getRestaurantReview(req, res) {
-  //   try {
-  //     const { restaurantId } = req.query;
-  //     const result = await Restaurant.getRestaurantReview(restaurantId);
-
-  //     if (result.success) {
-  //       success(res, "Successfully Received Reviews.", result.data);
-  //     } else {
-  //       failure(res, result.code, "Failed to get reviews", result.error);
-  //     }
-  //   } catch (err) {
-  //     failure(res, 500, "Failed to get reviews", "Internal Server Error");
-  //   }
-  // }
-
-  // async createRestaurantReview(req, res) {
-  //   try {
-  //     const authHeader = req.header("Authorization");
-  //     const token = authHeader.substring(7);
-  //     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-  //     const user_id = decodedToken.user.user_id;
-
-  //     const { restaurantId } = req.query;
-  //     const result = await Restaurant.createRestaurantReview(
-  //       restaurantId,
-  //       user_id,
-  //       JSON.parse(req.body)
-  //     );
-
-  //     if (result.success) {
-  //       success(res, "Successfully Received Reviews.", result.data);
-  //     } else {
-  //       failure(res, result.code, "Failed to add review", result.error);
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //     failure(res, 500, "Failed to add review", "Internal Server Error");
-  //   }
-  // }
-
-  async login(req, res) {
-    try {
-      const { email, password } = JSON.parse(req.body);
-
-      RestaurantModel.findOne({ email })
         .then(async (restaurant) => {
-          const isPasswordValid = await bcrypt.compare(
-            password,
-            restaurant.password
+          const menuItem = {
+            _id: new mongoose.Types.ObjectId(),
+            dishName: dishName,
+            price: price,
+          };
+
+          restaurant.menu.push(menuItem);
+          await restaurant.save();
+
+          writeToLogFile(
+            `Create a menu for Restaurant with ID ${restaurantId}`
           );
-
-          if (!isPasswordValid) {
-            return failure(res, 401, "Login failed", "Invalid password");
-          }
-
-          const token = jwt.sign(
-            {
-              restaurant: {
-                _id: restaurant._id,
-                name: restaurant.name,
-                location: restaurant.location,
-                cuisine: restaurant.cuisine,
-                rating: restaurant.rating,
-                contactNumber: restaurant.contactNumber,
-                owner: restaurant.owner,
-                email: restaurant.email,
-              },
-              role: "restaurant",
-            },
-            process.env.ACCESS_TOKEN_SECRET
-          );
-
-          return success(res, "Authentication successful", {
-            token,
-            restaurant: {
-              id: restaurant._id,
-              name: restaurant.name,
-              location: restaurant.location,
-              cuisine: restaurant.cuisine,
-              rating: restaurant.rating,
-              contactNumber: restaurant.contactNumber,
-              owner: restaurant.owner,
-              email: restaurant.email,
-            },
-          });
+          return success(res, HTTP_STATUS.CREATED, HTTP_RESPONSE.OK, menuItem);
         })
-        .catch((error) => {
-          return failure(res, 401, "Login failed", "Restaurant not found");
+        .catch((err) => {
+          writeToLogFile(
+            `Error: Create Restaurant Menu with ID ${restaurantId} ${err}`
+          );
+          return failure(
+            res,
+            HTTP_STATUS.INTERNAL_SERVER_ERROR,
+            RESPONSE_MESSAGE.SIGNUP_FAILED,
+            HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+          );
         });
     } catch (err) {
       console.log(err);
-      failure(res, 500, "Login failed", "Internal Server Issue");
+      writeToLogFile(`Error: Create Menu for Restaurant ${err}`);
+      failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.LOGIN_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getRestaurantMenu(req, res) {
+    try {
+      const { restaurantId } = req.params;
+      RestaurantModel.findOne({ _id: restaurantId })
+        .then((restaurant) => {
+          writeToLogFile(`Get menu for Restaurant with ID ${restaurantId}`);
+          return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, {
+            totlaItem: restaurant.menu.length,
+            menu: restaurant.menu,
+          });
+        })
+        .catch((err) => {
+          writeToLogFile(
+            `Error: Get menu for Restaurant with ID ${restaurantId} ${err}`
+          );
+          return failure(
+            res,
+            HTTP_STATUS.INTERNAL_SERVER_ERROR,
+            RESPONSE_MESSAGE.SIGNUP_FAILED,
+            HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+          );
+        });
+    } catch (err) {
+      writeToLogFile(
+        `Error: Get menu for Restaurant with ID ${restaurantId} ${err}`
+      );
+      return failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.SIGNUP_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
     }
   }
 }

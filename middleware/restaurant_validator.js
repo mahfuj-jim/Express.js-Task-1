@@ -1,98 +1,123 @@
 const { failure } = require("../util/common.js");
-const RestaurantModel = require("../models/restaurant_model.js");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
+const HTTP_STATUS = require("../constants/status_codes.js");
+const RESPONSE_MESSAGE = require("../constants/response_message");
 
-dotenv.config();
+const validateDish = (req, res, next) => {
+  const { dishName, price } = JSON.parse(req.body);
+  const errors = {};
 
-async function authenticateRestaurant(req, res, next) {
-  const authHeader = req.header("Authorization");
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return failure(res, 401, "Error Occurred", "Authentication required");
+  if (!dishName || typeof dishName !== "string" || dishName.trim() === "") {
+    errors.dishName = "Dish name is required";
   }
 
-  const token = authHeader.substring(7);
+  if (!price || typeof price !== "number" || price <= 0) {
+    errors.price = "Valid Price is required";
+  }
 
-  try {
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    const role = decodedToken.role;
-    const restaurant = decodedToken.restaurant;
+  if (Object.keys(errors).length > 0) {
+    return failure(
+      res,
+      HTTP_STATUS.BAD_REQUEST,
+      RESPONSE_MESSAGE.INVALID_DATA,
+      errors
+    );
+  }
 
-    if (role != "restaurant") {
-      return failure(res, 403, "Error Occurred", "Invalid Token");
+  next();
+};
+
+const validateQueryParams = (req, res, next) => {
+  const {
+    page,
+    limit,
+    filterOption,
+    filter,
+    sortOption,
+    sort,
+    search,
+    menuPrice,
+    priceComparison,
+    menuSort,
+  } = req.query;
+  const errors = {};
+
+  if (page) {
+    if (isNaN(page) || page < 1) {
+      errors.page = "Page must be a number greater than or equal to 1.";
     }
-
-    await RestaurantModel.findOne({ _id: restaurant._id })
-      .then((restaurantDetails) => {
-        
-      })
-      .catch((error) => {
-        return failure(res, 403, "Error Occurred", "Invalid Restaurant");
-      });
-
-    // if (JSON.parse(req.body).id) {
-    //   return failure(res, 400, "Error Occurred", "Shouldn't Containt ID");
-    // }
-
-    // const responseUserData = await Restaurant.getAllRestaurantData();
-    // const restaurantData = responseUserData.data;
-    // const restaurantIndex = restaurantData.findIndex(
-    //   (item) => item.id == restaurant.id
-    // );
-
-    // if (restaurantIndex == -1) {
-    //   return failure(res, 403, "Error Occurred", "Invalid Restaurant");
-    // }
-
-    // const { restaurantId } = req.params;
-    // if (
-    //   Object.keys(req.params).length !== 0 &&
-    //   (restaurantId == "" || restaurantId != restaurant.id)
-    // ) {
-    //   console.log(restaurantId);
-    //   return failure(res, 403, "Error Occurred", "Invalid Restaurant");
-    // }
-
-    next();
-  } catch (err) {
-    return failure(res, 403, "Error Occurred", "Invalid Token");
   }
-}
-
-async function validateRestaurantReview(req, res, next) {
-  const authHeader = req.header("Authorization");
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return failure(res, 401, "Error Occurred", "Authentication required");
+  if (limit) {
+    if (isNaN(limit) || limit < 1) {
+      errors.limit = "Limit must be a number greater than or equal to 1.";
+    }
   }
 
-  const token = authHeader.substring(7);
-
-  try {
-    // const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    // const role = decodedToken.role;
-
-    // if (role != "restaurant" && role != "user") {
-    //   return failure(res, 403, "Error Occurred", "Invalid Token");
-    // }
-
-    // if (role == "restaurant") {
-    //   const restaurant = decodedToken.restaurant;
-
-    //   if (restaurant.id != req.query.restaurantId) {
-    //     return failure(res, 403, "Error Occurred", "Invalid Token");
-    //   }
-    // }
-
-    next();
-  } catch (err) {
-    return failure(res, 403, "Error Occurred", "Invalid Token");
+  if (filterOption) {
+    if (!["cuisine", "menu", "location"].includes(filterOption)) {
+      errors.filterOption = "Invalid filterOption value.";
+    } else if (!filter) {
+      errors.filter = "FilterOption exists, but filter is missing.";
+    }
   }
-}
+  if (filter) {
+    if (!filterOption) {
+      errors.filterOption = "Filter exists, but filterOption is missing.";
+    }
+  }
+
+  if (sortOption) {
+    if (sortOption !== "deliveryFee") {
+      errors.sortOption = "Invalid sortOption value.";
+    } else if (!sort) {
+      errors.sort = "SortOption exists, but sort is missing.";
+    }
+  }
+  if (sort) {
+    if (!sortOption) {
+      errors.sortOption = "Sort exists, but sortOption is missing.";
+    } else if (!["asc", "desc"].includes(sort)) {
+      errors.sort = 'Invalid sort value (must be "asc" or "desc").';
+    }
+  }
+
+  if (search && (typeof search !== "string" || search.trim() === "")) {
+    errors.search = "Search must be a non-empty string.";
+  }
+
+  if (menuPrice) {
+    if (isNaN(menuPrice)) {
+      errors.menuPrice = "MenuPrice must be a number.";
+    } else if (!priceComparison) {
+      errors.priceComparison =
+        "MenuPrice exists, but priceComparison is missing.";
+    }
+  }
+  if (priceComparison) {
+    if (!menuPrice) {
+      errors.menuPrice = "PriceComparison exists, but menuPrice is missing.";
+    } else if (!["greater", "less"].includes(priceComparison)) {
+      errors.priceComparison =
+        'Invalid priceComparison value (must be "greater" or "less").';
+    }
+  }
+
+  if (menuSort && !["asc", "desc"].includes(menuSort)) {
+    errors.menuSort = 'Invalid menuSort value (must be "asc" or "desc").';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return failure(
+      res,
+      HTTP_STATUS.BAD_REQUEST,
+      RESPONSE_MESSAGE.INVALID_DATA,
+      errors
+    );
+  }
+
+  next();
+};
 
 module.exports = {
-  authenticateRestaurant,
-  validateRestaurantReview,
+  validateDish,
+  validateQueryParams
 };

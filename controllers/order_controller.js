@@ -1,337 +1,431 @@
-const { success, failure } = require("../util/common.js");
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
-const { getCurrentDateTime } = require("../util/common.js");
-const RestaurantModel = require("../models/restaurant_model.js");
-const OrderModel = require("../models/order_models.js");
+const OrderModel = require("../models/order_model");
+const CartModel = require("../models/cart_model");
+const TransactionModel = require("../models/transaction_model");
+const UserModel = require("../models/user_model");
+const RestaurantModel = require("../models/restaurant_model");
+const RiderModel = require("../models/rider_model");
+const { success, failure, writeToLogFile } = require("../util/common.js");
+const HTTP_STATUS = require("../constants/status_codes.js");
+const HTTP_RESPONSE = require("../constants/status_response");
+const RESPONSE_MESSAGE = require("../constants/response_message");
 
 class OrderController {
-  async getAllOrderData(req, res) {
+  async getAllOrder(req, res) {
     try {
-      const status = req.query.onProccessOrder;
-      const filter = {};
-      if (status == 'true') {
-        filter.order_status = "On Process";
-      }
-
-      const orders = await OrderModel.aggregate([
-        { $match: filter },
-        {
-          $lookup: {
-            from: "users",
-            localField: "user",
-            foreignField: "_id",
-            as: "user",
-          },
-        },
-        {
-          $lookup: {
-            from: "restaurants",
-            localField: "restaurant",
-            foreignField: "_id",
-            as: "restaurant",
-          },
-        },
-        {
-          $addFields: {
-            total_price: {
-              $add: [
-                "$delivery_fee",
-                {
-                  $sum: {
-                    $map: {
-                      input: "$order_list",
-                      as: "item",
-                      in: { $multiply: ["$$item.price", "$$item.quantity"] },
-                    },
-                  },
-                },
-              ],
-            },
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            time: 1,
-            order_status: 1,
-            delivery_fee: 1,
-            order_list: 1,
-            location: 1,
-            delivered_time: 1,
-            user: {
-              name: 1,
-              phoneNumber: 1,
-            },
-            restaurant: {
-              name: 1,
-              contactNumber: 1,
-              location: 1,
-            },
-            total_price: 1,
-          },
-        },
-      ]);
-
-      if (orders) {
-        success(res, "Successfully Received.", {
-          total_orders: orders.length,
-          orders: orders,
+      const orders = await OrderModel.find()
+        .populate({
+          path: "users",
+          select: "_id name phoneNumber",
+        })
+        .populate({
+          path: "restaurants",
+          select: "_id name contactNumber location",
+        })
+        .populate({
+          path: "riders",
+          select: "_id name phoneNumber",
         });
-      } else {
-        failure(res, 500, "Failed to get data.", "Internal Server Issue");
+
+      if (!orders) {
+        writeToLogFile(`Error: Get all order`);
+        return failure(
+          res,
+          HTTP_STATUS.OK,
+          HTTP_RESPONSE.OK,
+          RESPONSE_MESSAGE.ORDER_NOT_FOUND
+        );
       }
-    } catch (error) {
-      console.log(error);
-      failure(res, 500, "Failed to get data", "Internal Server Issue");
-    }
-  }
 
-  async getOrderById(req, res) {
-    const orderId = req.params.orderId;
-
-    try {
-      const orders = await OrderModel.aggregate([
-        { $match: { _id: new mongoose.Types.ObjectId(orderId) } },
-        {
-          $lookup: {
-            from: "users",
-            localField: "user",
-            foreignField: "_id",
-            as: "user",
-          },
-        },
-        {
-          $lookup: {
-            from: "restaurants",
-            localField: "restaurant",
-            foreignField: "_id",
-            as: "restaurant",
-          },
-        },
-        {
-          $addFields: {
-            total_price: {
-              $add: [
-                "$delivery_fee",
-                {
-                  $sum: {
-                    $map: {
-                      input: "$order_list",
-                      as: "item",
-                      in: { $multiply: ["$$item.price", "$$item.quantity"] },
-                    },
-                  },
-                },
-              ],
-            },
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            time: 1,
-            order_status: 1,
-            delivery_fee: 1,
-            order_list: 1,
-            location: 1,
-            delivered_time: 1,
-            user: {
-              name: 1,
-              phoneNumber: 1,
-            },
-            restaurant: {
-              name: 1,
-              contactNumber: 1,
-              location: 1,
-            },
-            total_price: 1,
-          },
-        },
-      ]);
-
-      if (orders.length > 0) {
-        success(res, "Successfully Received.", orders);
-      } else {
-        failure(res, 404, "No order data found.", "No orders available.");
-      }
-    } catch (error) {
-      console.log(error);
-      failure(res, 500, "Failed to get data", "Internal Server Issue");
+      writeToLogFile(`Get All Order`);
+      return success(res, HTTP_STATUS.OK, HTTP_RESPONSE.OK, orders);
+    } catch (err) {
+      writeToLogFile(`Error: Get All Order ${err}`);
+      return failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.SIGNUP_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
   async createOrder(req, res) {
     try {
-      const authHeader = req.header("Authorization");
-      const token = authHeader.substring(7);
-      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-      const user_id = decodedToken.user._id;
+      const { user_id } = JSON.parse(req.body);
+      let orderList = [];
+      let totalPrice = 0;
 
-      let order = JSON.parse(req.body);
+      const user = await UserModel.findOne({ _id: user_id });
+      if (!user) {
+        writeToLogFile(
+          `Error: Create a Order for User with ID ${user_id} ${err}`
+        );
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.USER_NOT_FOUND
+        );
+      }
 
-      const restaurantId = order.restaurant;
-      const delivery_options = await RestaurantModel.findOne(
-        { _id: new mongoose.Types.ObjectId(restaurantId) },
-        { "deliveryOptions.deliveryFee": 1, _id: 0 }
-      );
+      const cart = await CartModel.findOne({ users: user_id });
+      if (!cart || !cart.restaurants || !cart.orderList || cart.orderList.length === 0) {
+        writeToLogFile(
+          `Error: Create a Order for User with ID ${user_id} Cart is not Available`
+        );
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.CART_NOT_FOUND
+        );
+      }
 
-      order = {
-        ...order,
-        user: user_id,
-        order_list: order.order_list,
-        deliveryFee: delivery_options.deliveryOptions.deliveryFee,
-        time: getCurrentDateTime(),
-        order_status: "On Process",
+      const restaurant = await RestaurantModel.findOne({
+        _id: cart.restaurants,
+      });
+      if (!restaurant) {
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.RESTAURANT_NOT_FOUND
+        );
+      }
+
+      cart.orderList.map((orderItem) => {
+        restaurant.menu.map((item) => {
+          if (orderItem.dishId.toString() === item._id.toString()) {
+            totalPrice += item.price * orderItem.quantity;
+            orderList.push({
+              dishName: item.dishName,
+              price: item.price,
+              quantity: orderItem.quantity,
+            });
+          }
+        });
+      });
+
+      const rider = await RiderModel.findOne({
+        isActive: true,
+        isEngaged: false,
+      });
+      if (!rider) {
+        writeToLogFile(`Create a order for User with ID ${user_id}`);
+        return success(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.RIDER_NOT_FOUND
+        );
+      }
+
+      const order = {
+        time: new Date(),
+        orderStatus: "Pending",
+        deliveryFee: restaurant.deliveryOptions.deliveryFee,
+        orderList: orderList,
+        location: user.location,
+        riders: rider._id,
+        restaurants: restaurant._id,
+        users: user._id,
+        totalPrice: totalPrice,
       };
 
-      await OrderModel.create(order)
-        .then((newOrder) => {
-          return success(res, "Successfully Created.", newOrder);
-        })
-        .catch((err) => {
-          console.log(err);
-          return failure(
-            res,
-            500,
-            "Failed to create new order",
-            "Internal Server Issue"
-          );
-        });
+      const createOrder = await OrderModel.create(order);
+
+      if (!createOrder) {
+        writeToLogFile(`Error: Create a order for User with ID ${userId}`);
+        return failure(
+          res,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          RESPONSE_MESSAGE.FAILED_CREATE_ORDER,
+          HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      rider.isEngaged = true;
+      await rider.save();
+
+      cart.restaurants = null;
+      cart.orderList = [];
+      await cart.save();
+
+      writeToLogFile(`Create a order for User with ID ${user_id}`);
+      return success(res, HTTP_STATUS.CREATED, HTTP_RESPONSE.OK, createOrder);
     } catch (err) {
-      return failure(
+      console.log(err);
+      writeToLogFile(`Error: Failed to Create Order for User${err}`);
+      failure(
         res,
-        500,
-        "Failed to create new order",
-        "Internal Server Issue"
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.LOGIN_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-  async getOrderByUserId(req, res){
-
-  }
-
-  async getOrderByRestaurantId(req, res) {
+  async confirmOrderByRestaurant(req, res) {
     try {
-      const authHeader = req.header("Authorization");
-      const token = authHeader.substring(7);
-      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-      const restaurantId = decodedToken.restaurant._id;
+      const { confirm } = req.query;
+      const { orderId } = JSON.parse(req.body);
 
-      const status = req.query.onProccessOrder;
+      const order = await OrderModel.findOne({ _id: orderId });
 
-      const filter = {
-        restaurant: restaurantId,
-      };
-
-      if (status == 'true') {
-        filter.order_status = "On Process";
+      if (!order) {
+        writeToLogFile(`Error: Failed Confirm Order with ID ${orderId}`);
+        failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.ORDER_NOT_FOUND
+        );
       }
 
-      await OrderModel.find(filter)
-        .populate("user", "name phoneNumber")
-        .populate("restaurant", "name contactNumber location")
-        .then((orders) => {
-          return success(res, "Successfully Received.", {
-            total_orders: orders.length,
-            orders: orders,
-          });
-        })
-        .catch((err) => {
-          return failure(
-            res,
-            500,
-            "Failed to get data",
-            "Internal Server Error"
-          );
-          v;
-        });
-    } catch (error) {
-      return failure(res, 500, "Failed to get data", "Internal Server Error");
+      if (confirm != "true") {
+        writeToLogFile(`Error: Failed Confirm Order with ID ${orderId}`);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_DATA
+        );
+      }
+
+      if (order.orderStatus !== "Pending") {
+        writeToLogFile(`Error: Failed Confirm Order with ID ${orderId}`);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_REQUEST
+        );
+      }
+
+      order.orderStatus = "Processing";
+      await order.save();
+
+      writeToLogFile(`Confirm Order with ID ${orderId}`);
+      return success(
+        res,
+        HTTP_STATUS.OK,
+        HTTP_RESPONSE.OK,
+        RESPONSE_MESSAGE.ORDER_PROCESSING
+      );
+    } catch (err) {
+      console.log(err);
+      writeToLogFile(`Error: Failed Confirm Order ${err}`);
+      failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.LOGIN_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async handoverOrderByRestaurant(req, res) {
+    try {
+      const { confirm } = req.query;
+      const { orderId } = JSON.parse(req.body);
+
+      const order = await OrderModel.findOne({ _id: orderId });
+
+      if (!order) {
+        writeToLogFile(`Error: Failed Handover Order with ID ${orderId}`);
+        failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.ORDER_NOT_FOUND
+        );
+      }
+
+      if (confirm != "true") {
+        writeToLogFile(`Error: Failed Handover Order with ID ${orderId}`);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_DATA
+        );
+      }
+
+      if (order.orderStatus !== "Processing") {
+        writeToLogFile(`Error: Failed Handover Order with ID ${orderId}`);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_REQUEST
+        );
+      }
+
+      order.orderStatus = "Ready";
+      await order.save();
+
+      writeToLogFile(`Handover Order with ID ${orderId}`);
+      return success(
+        res,
+        HTTP_STATUS.OK,
+        HTTP_RESPONSE.OK,
+        RESPONSE_MESSAGE.ORDER_READY
+      );
+    } catch (err) {
+      console.log(err);
+      writeToLogFile(`Error: Failed Handover Order ${err}`);
+      failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.LOGIN_FAILED,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async reachOrderByRider(req, res) {
+    try {
+      const { confirm } = req.query;
+      const { orderId } = JSON.parse(req.body);
+
+      const order = await OrderModel.findOne({ _id: orderId });
+
+      if (!order) {
+        writeToLogFile(`Error: Failed Reach Order with ID ${orderId}`);
+        failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.ORDER_NOT_FOUND
+        );
+      }
+
+      if (confirm != "true") {
+        writeToLogFile(`Error: Failed Reach Order with ID ${orderId}`);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_DATA
+        );
+      }
+
+      if (order.orderStatus !== "Ready") {
+        writeToLogFile(`Error: Failed Reach Order with ID ${orderId}`);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_REQUEST
+        );
+      }
+
+      order.orderStatus = "Reached";
+      await order.save();
+
+      writeToLogFile(`Reach Order with ID ${orderId}`);
+      return success(
+        res,
+        HTTP_STATUS.OK,
+        HTTP_RESPONSE.OK,
+        RESPONSE_MESSAGE.ORDER_REACHED
+      );
+    } catch (err) {
+      console.log(err);
+      writeToLogFile(`Error: Failed Reach Order ${err}`);
+      failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async deliveryOrder(req, res) {
+    try {
+      const { confirm } = req.query;
+      const { orderId } = JSON.parse(req.body);
+
+      const order = await OrderModel.findOne({ _id: orderId });
+
+      if (!order) {
+        writeToLogFile(`Error: Failed Delivery Order with ID ${orderId}`);
+        failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.ORDER_NOT_FOUND
+        );
+      }
+
+      if (confirm != "true") {
+        writeToLogFile(`Error: Failed Delivery Order with ID ${orderId}`);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_DATA
+        );
+      }
+
+      if (order.orderStatus !== "Reached") {
+        writeToLogFile(`Error: Failed Delivery Order with ID ${orderId}`);
+        return failure(
+          res,
+          HTTP_STATUS.BAD_REQUEST,
+          RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+          RESPONSE_MESSAGE.INVALID_REQUEST
+        );
+      }
+
+      const rider = await RiderModel.findOne({ _id: order.riders });
+      if (!rider) {
+        writeToLogFile(`Error: Failed Delivery Order`);
+        return failure(
+          res,
+          HTTP_STATUS.NOT_FOUND,
+          HTTP_RESPONSE.NOT_FOUND,
+          RESPONSE_MESSAGE.RIDER_NOT_FOUND
+        );
+      }
+
+      const transaction = await TransactionModel.findOne({ orders: orderId });
+
+      if (!transaction) {
+        writeToLogFile(`Error: Failed Delivery Order`);
+        return failure(
+          res,
+          HTTP_STATUS.CONFLICT,
+          HTTP_RESPONSE.CONFLICT,
+          RESPONSE_MESSAGE.TRANSACTION_NOT_MADE
+        );
+      }
+
+      order.orderStatus = "Delivered";
+      await order.save();
+
+      rider.isEngaged = false;
+      await rider.save();
+
+      writeToLogFile(`Deliveried Order with ID ${orderId}`);
+      return success(
+        res,
+        HTTP_STATUS.OK,
+        HTTP_RESPONSE.OK,
+        RESPONSE_MESSAGE.ORDER_DELIVERED
+      );
+    } catch (err) {
+      console.log(err);
+      writeToLogFile(`Error: Failed Delivery Order ${err}`);
+      failure(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        RESPONSE_MESSAGE.FAILED_TO_PROCESS,
+        HTTP_RESPONSE.INTERNAL_SERVER_ERROR
+      );
     }
   }
 }
-
-// class OrderController {
-
-//   async getOrderByRestaurantId(req, res){
-//     try {
-//       const authHeader = req.header("Authorization");
-//       const token = authHeader.substring(7);
-//       const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-//       const id = decodedToken.restaurant.id;
-
-//       const result = await Order.getRestaurantOrder(id);
-//       if (result.success) {
-//         success(res, "Successfully Received.", result.data);
-//       } else {
-//         failure(res, result.code, "Failed to get data", result.error);
-//       }
-//     } catch (err) {
-//       console.log(err);
-//       failure(res, 500, "Failed to get data", "Internal Server Error");
-//     }
-//   }
-
-//   async getOrderByUserID(req, res) {
-//     try {
-//       const authHeader = req.header("Authorization");
-//       const token = authHeader.substring(7);
-//       const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-//       const user_id = decodedToken.user.user_id;
-
-//       const result = await Order.getUserOrder(user_id);
-//       if (result.success) {
-//         success(res, "Successfully Received.", result.data);
-//       } else {
-//         failure(res, result.code, "Failed to get data", result.error);
-//       }
-//     } catch (err) {
-//       console.log(err);
-//       failure(res, 500, "Failed to get data", "Internal Server Error");
-//     }
-//   }
-
-//   async completeOrder(req, res) {
-//     try {
-//       const { orderId, order_status } = req.query;
-
-//       if (order_status === "done") {
-//         const result = await Order.completeOrder(orderId);
-
-//         if (result.success) {
-//           success(res, "Successfully Done.", result.data);
-//         } else {
-//           failure(res, result.code, "Failed to update", result.error);
-//         }
-//       } else {
-//         failure(res, 400, "Failed to connect", "Invalid request");
-//       }
-//     } catch (err) {
-//       console.log(err);
-//       failure(res, 500, "Failed to update", "Internal Server Error");
-//     }
-//   }
-
-//   async createOrder(req, res) {
-//     try {
-//       const authHeader = req.header("Authorization");
-//       const token = authHeader.substring(7);
-//       const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-//       const user_id = decodedToken.user.user_id;
-
-//       const result = await Order.createOrder(user_id, JSON.parse(req.body));
-
-//       if (result.success) {
-//         success(res, "Successfully Created.", result.data);
-//       } else {
-//         failure(res, result.code, "Failed to create new order", result.error);
-//       }
-//     } catch (err) {
-//       failure(res, 500, "Failed to create new order", "Internal Server Issue");
-//     }
-//   }
-// }
 
 module.exports = new OrderController();
